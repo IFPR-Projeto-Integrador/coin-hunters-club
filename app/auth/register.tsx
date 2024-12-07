@@ -1,0 +1,81 @@
+import { CHCLogo } from "@/components/CHCLogo";
+import { GoldButton } from "@/components/layout/GoldButton";
+import { MainView } from "@/components/layout/MainView";
+import { FormInput } from "@/components/ui/FormInput";
+import { StdStyles } from "@/constants/Styles";
+import { RegisterInformation, User, UserType, register } from "@/Firebase/usuario/usuario";
+import { useState } from "react";
+import { StyleSheet, View } from "react-native";
+import { router } from 'expo-router';
+
+import { NavigationProp } from '@react-navigation/native';
+
+export default function Register() {
+    const [tab, setTab] = useState<"cliente" | "empresa">("cliente");
+
+    const [login, setLogin] = useState("");
+    const [senha, setSenha] = useState("");
+    const [confirmsenha, setConfirmsenha] = useState("");
+    const [email, setEmail] = useState("");
+    const [confirmemail, setConfirmemail] = useState("");
+    const [nome, setNome] = useState("");
+    const [cpfCnpj, setCpfCnpj] = useState("");
+
+    function cadastrar() {
+        const user: User & RegisterInformation = {
+            login,
+            nome,
+            email,
+            dtNascimento: null,
+            cpfCnpj,
+            tipoUsuario: tab === "cliente" ? UserType.CLIENTE : UserType.EMPRESA,
+            senha
+        };
+
+        register(user);
+        router.navigate("/");
+    }
+
+    return (
+        <MainView>
+            <CHCLogo />
+            <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
+                <View style={styles.buttonContainer}>
+                    <GoldButton title="Cliente" onPress={() => setTab("cliente")} active={tab === "cliente"} style={[styles.tabButton, { marginRight: 10 }]}></GoldButton>
+                    <GoldButton title="Empresa" onPress={() => setTab("empresa")} active={tab === "empresa"} style={styles.tabButton}></GoldButton>
+                </View>
+
+                <FormInput label="Login" setValue={setLogin} value={login}  />
+                <FormInput label="Senha" setValue={setSenha} value={senha} password />
+                <FormInput label="Confirmar Senha" setValue={setConfirmsenha} value={confirmsenha} password />
+                <FormInput label="Email" setValue={setEmail} value={email} />
+                <FormInput label="Confirmar Email" setValue={setConfirmemail} value={confirmemail} />
+                <FormInput label="Nome" setValue={setNome} value={nome} />
+                <FormInput label={tab === "cliente" ? "CPF" : "CNPJ"} setValue={setCpfCnpj} value={cpfCnpj} />
+
+                <GoldButton title="Cadastrar-se" onPress={cadastrar} style={styles.registerButton}></GoldButton>
+            </View>
+        </MainView>
+    )
+}
+
+const styles = StyleSheet.create({
+    mainContainer: {
+        padding: 15
+    },
+    titleContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+    },
+    tabButton: {
+        flex: 1,
+    },
+    registerButton: {
+        marginTop: 20,
+    },
+})

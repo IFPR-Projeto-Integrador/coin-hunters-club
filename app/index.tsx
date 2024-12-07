@@ -1,7 +1,4 @@
-import { Image, StyleSheet } from 'react-native';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView, Pressable } from 'react-native-gesture-handler';
 import { getAllUsers, getLoggedUser, login, logout ,register, UserType } from "@/Firebase/usuario/usuario"
 import { Colors } from "@/constants/Colors";
@@ -43,27 +40,25 @@ export default function HomeScreen() {
 
   return (
     <GestureHandlerRootView>
-      <ParallaxScrollView style={{ backgroundColor: Colors.background}}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedView style={styles.buttons}>
-            <Pressable onPress={getUsers}>
-              <ThemedText>Logged User</ThemedText>
-            </Pressable>
-            <Pressable onPress={loginUser}>
-              <ThemedText>Login</ThemedText>
-            </Pressable>
-            <Pressable onPress={logoutUser}>
-              <ThemedText>Logout</ThemedText>
-            </Pressable>
-            <Pressable onPress={registerUser}>
-              <ThemedText>Register</ThemedText>
-            </Pressable>
-            <Pressable onPress={allUsers}>
-              <ThemedText>All Users</ThemedText>
-            </Pressable>
-          </ThemedView>
-        </ThemedView>
-      </ParallaxScrollView>
+      <View style={styles.titleContainer}>
+        <View style={styles.buttons}>
+          <Pressable onPress={getUsers}>
+            <Text>Logged User</Text>
+          </Pressable>
+          <Pressable onPress={loginUser}>
+            <Text>Login</Text>
+          </Pressable>
+          <Pressable onPress={logoutUser}>
+            <Text>Logout</Text>
+          </Pressable>
+          <Pressable onPress={registerUser}>
+            <Text>Register</Text>
+          </Pressable>
+          <Pressable onPress={allUsers}>
+            <Text>All Users</Text>
+          </Pressable>
+        </View>
+      </View>
     </GestureHandlerRootView>
     
   );

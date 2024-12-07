@@ -7,6 +7,6 @@ export const Colors = {
   background: "#3AC5CE",
   panel: "#8ADFD8",
   primary: "#FBD408",
-  primaryActive: "#FBD408",
+  primaryActive: "#FCE9AA",
   fontColor: "#000"
 };
