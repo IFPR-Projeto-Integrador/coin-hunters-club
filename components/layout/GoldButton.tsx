@@ -11,7 +11,6 @@ interface ButtonProps extends TouchableOpacityProps {
 }
 
 export function GoldButton ({ title, onPress, textStyle, disabled = false, active = false, style, ...toucheableOpacity }: ButtonProps) {
-    console.log(active);
     return (
         <TouchableOpacity
         style={[styles.button, style, disabled && styles.disabled, active && styles.active]}
@@ -19,7 +18,7 @@ export function GoldButton ({ title, onPress, textStyle, disabled = false, activ
         onPress={onPress}
         disabled={disabled}
         >
-        <Text style={[styles.buttonText, textStyle]}>{title}</Text>
+          <Text style={[styles.buttonText, textStyle]}>{title}</Text>
         </TouchableOpacity>
     );
 };

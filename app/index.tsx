@@ -1,90 +1,121 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { GestureHandlerRootView, Pressable } from 'react-native-gesture-handler';
-import { getAllUsers, getLoggedUser, login, logout ,register, UserType } from "@/Firebase/usuario/usuario"
+import { CHCLogo } from "@/components/CHCLogo";
+import { GoldButton } from "@/components/layout/GoldButton";
+import { MainView } from "@/components/layout/MainView";
+import { FormInput } from "@/components/ui/FormInput";
+import { StdStyles } from "@/constants/Styles";
+import { useState } from "react";
+import { StyleSheet, View, Text } from "react-native";
+import { router } from 'expo-router';
 import { Colors } from "@/constants/Colors";
+import { CHCUser, LoginError, login as loginUser } from "@/Firebase/usuario/usuario";
 
-export default function HomeScreen() {
-  const email = "alecalmirp@gmail.com";
-  const senha = "batata";
-  async function getUsers() {
-    const usuarios = await getLoggedUser();
+export default function LoginScreen() {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [errors, setErrors] = useState<string[]>([])
 
-    console.log(usuarios);
+  async function handleLogin() {
+    const result = await loginUser(email, senha);
+
+    if (typeof result == "string") {
+      switch(result) {
+        case LoginError.INVALID_CREDENTIALS:
+          setErrors(["Usuário ou senha inválidos"]);
+          break;
+        case LoginError.INVALID_EMAIL:
+          setErrors(["Email inválido"]);
+          break;
+        case LoginError.USER_NOT_FOUND:
+          setErrors(["Usuário não encontrado"]);
+          break;
+        case LoginError.EMAIL_EXISTS:
+          setErrors(["Email já cadastrado"]);
+          break;
+        case LoginError.INVALID_PASSWORD:
+          setErrors(["Senha inválida"]);
+          break;
+        case LoginError.INVALID_CREDENTIAL:
+          setErrors(["Email ou senha incorretos"]);
+          break;
+        default:
+          setErrors(["Erro desconhecido"]);
+      }
+
+      return
+    }
+
+    router.navigate("/");
   }
 
-  async function loginUser() {
-    await login(email, senha);
+  function toForgotPassword() {
+    router.navigate("auth/forgotPassword");
   }
 
-  async function logoutUser() {
-    await logout();
-  }
-
-  async function registerUser() {
-    await register({
-      login: "alecalmirp",
-      nome: "Yuri Almir Pinto",
-      email: email,
-      senha: senha,
-      dtNascimento: "1996-02-29",
-      cpfCnpj: "12345678900",
-      tipoUsuario: UserType.CLIENTE,
-    });
-  }
-
-  async function allUsers() {
-    const usuarios = await getAllUsers();
-
-    console.log(usuarios);
+  function goToRegister() {
+    router.navigate("/auth/register");
   }
 
   return (
-    <GestureHandlerRootView>
-      <View style={styles.titleContainer}>
-        <View style={styles.buttons}>
-          <Pressable onPress={getUsers}>
-            <Text>Logged User</Text>
-          </Pressable>
-          <Pressable onPress={loginUser}>
-            <Text>Login</Text>
-          </Pressable>
-          <Pressable onPress={logoutUser}>
-            <Text>Logout</Text>
-          </Pressable>
-          <Pressable onPress={registerUser}>
-            <Text>Register</Text>
-          </Pressable>
-          <Pressable onPress={allUsers}>
-            <Text>All Users</Text>
-          </Pressable>
+    <MainView>
+      <CHCLogo />
+      <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
+        {errors.map((error, index) => <Text style={styles.errorMessage} key={index}>{error}</Text>)}
+        <FormInput label="Email" setValue={setEmail} value={email} />
+        <FormInput label="Senha" setValue={setSenha} value={senha} password />
+
+        <GoldButton
+          title="Logar"
+          onPress={handleLogin}
+          style={styles.loginButton}
+        />
+        
+        <Text style={styles.forgotPassword} onPress={toForgotPassword}>
+          Esqueceu sua senha?
+        </Text>
+
+        <View style={styles.registerContainer}>
+          <Text style={styles.registerText}>Não possui uma conta?</Text>
+          <GoldButton
+            title="Registrar-se"
+            onPress={goToRegister}
+            style={styles.registerButton}
+          />
         </View>
       </View>
-    </GestureHandlerRootView>
-    
+    </MainView>
   );
 }
 
+const fontSize = 16;
+
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 8,
+  mainContainer: {
+    padding: 15,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  loginButton: {
+    marginTop: 10,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  forgotPassword: {
+    marginTop: 10,
+    color: Colors.fontColor,
+    textAlign: "center",
+    textDecorationLine: "underline",
+    fontSize: fontSize,
   },
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: 16,
-  }
+  registerContainer: {
+    marginTop: 20,
+  },
+  registerText: {
+    marginBottom: 5,
+    fontSize: fontSize,
+    textAlign: "center",
+  },
+  registerButton: {
+    marginTop: 5,
+  },
+  errorMessage: {
+    color: "red",
+    fontSize: fontSize,
+  },
 });
+

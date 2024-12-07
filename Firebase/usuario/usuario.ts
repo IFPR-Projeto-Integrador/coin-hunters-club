@@ -7,7 +7,7 @@ export enum UserType {
     FUNCIONARIO = "funcionario"
 }
 
-export interface User {
+export interface CHCUser {
     login: string;
     nome: string;
     email: string;
@@ -20,7 +20,7 @@ export interface RegisterInformation {
     senha: string;
 }
 
-export async function getLoggedUser() {
+export async function getLoggedUser(): Promise<CHCUser | null> {
     if (db.auth.currentUser === null) {
         return null;
     }
@@ -29,7 +29,7 @@ export async function getLoggedUser() {
     const usuarioQuery = db.query(usuariosCollection, db.where(db.documentId(), "==", db.auth.currentUser?.uid));
     const usuario = await db.getDocs(usuarioQuery);
 
-    return usuario.docs.map((doc) => doc.data() as User)[0];
+    return usuario.docs.map((doc) => doc.data() as CHCUser)[0];
 }
 
 export async function getAllUsers() {
@@ -37,19 +37,41 @@ export async function getAllUsers() {
     // Select only name and email fields
     const usuarios = await db.getDocs(usuariosCollection);
 
-    return usuarios.docs.map((doc) => doc.data() as User);
+    return usuarios.docs.map((doc) => doc.data() as CHCUser);
 }
 
-export async function login(email: string, senha: string) {
+export enum LoginError {
+    INVALID_CREDENTIALS = "auth/invalid", INVALID_EMAIL = "auth/invalid-email", USER_NOT_FOUND = "auth/user-not-found", EMAIL_EXISTS = "auth/email-already-exists",
+    INVALID_PASSWORD = "auth/invalid-password", INVALID_CREDENTIAL = "auth/invalid-credential", UNKNOWN = "unknown"
+}
+
+export async function login(email: string, senha: string): Promise<CHCUser | LoginError> {
     try {
-        const userCredential = await db.signInWithEmailAndPassword(db.auth, email, senha);
-        const user = userCredential.user;
-        console.log("User logged in:", user);
+        await db.signInWithEmailAndPassword(db.auth, email, senha);
+
+        return await getLoggedUser() as CHCUser;
     } catch (error) {
         if (error instanceof FirebaseError) {
-            console.error("Error logging in user:", error.message);
+            switch (error.code) {
+                case LoginError.INVALID_CREDENTIALS:
+                    return LoginError.INVALID_CREDENTIALS;
+                case LoginError.INVALID_EMAIL:
+                    return LoginError.INVALID_EMAIL;
+                case LoginError.USER_NOT_FOUND:
+                    return LoginError.USER_NOT_FOUND;
+                case LoginError.EMAIL_EXISTS:
+                    return LoginError.EMAIL_EXISTS;
+                case LoginError.INVALID_PASSWORD:
+                    return LoginError.INVALID_PASSWORD;
+                case LoginError.INVALID_CREDENTIAL:
+                    return LoginError.INVALID_CREDENTIAL;
+                default:
+                    return LoginError.UNKNOWN;
+            }
         }
-    }   
+    }
+
+    throw new Error("'login' function should not reach this point");
 }
 
 export async function logout() {
@@ -63,7 +85,7 @@ export async function logout() {
     }
 }
 
-export async function register({login, nome, email, senha, dtNascimento, cpfCnpj, tipoUsuario}: User & RegisterInformation) {
+export async function register({login, nome, email, senha, dtNascimento, cpfCnpj, tipoUsuario}: CHCUser & RegisterInformation) {
     try {
         const userCredential = await db.createUserWithEmailAndPassword(db.auth, email, senha);
         const authUser = userCredential.user;

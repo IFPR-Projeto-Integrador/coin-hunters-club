@@ -3,12 +3,10 @@ import { GoldButton } from "@/components/layout/GoldButton";
 import { MainView } from "@/components/layout/MainView";
 import { FormInput } from "@/components/ui/FormInput";
 import { StdStyles } from "@/constants/Styles";
-import { RegisterInformation, User, UserType, register } from "@/Firebase/usuario/usuario";
+import { RegisterInformation, CHCUser, UserType, register } from "@/Firebase/usuario/usuario";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { router } from 'expo-router';
-
-import { NavigationProp } from '@react-navigation/native';
 
 export default function Register() {
     const [tab, setTab] = useState<"cliente" | "empresa">("cliente");
@@ -22,7 +20,7 @@ export default function Register() {
     const [cpfCnpj, setCpfCnpj] = useState("");
 
     function cadastrar() {
-        const user: User & RegisterInformation = {
+        const user: CHCUser & RegisterInformation = {
             login,
             nome,
             email,
