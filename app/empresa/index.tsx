@@ -2,10 +2,20 @@ import { GoldButton } from "@/components/ui/GoldButton";
 import { MainView } from "@/components/layout/MainView";
 import { StdStyles } from "@/constants/Styles";
 import { router } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import headerConfig from "@/helper/headerConfig";
+import { useAuth } from "@/context/authContext";
 
 export default function IndexEmpresa() {
+    const [user, loading] = useAuth();
+
+    if (loading) {
+        return null;
+    }
+
+    headerConfig({ title: user?.nome ?? "Empresa" });
+
     return (
         <ProtectedRoute>
             <MainView>

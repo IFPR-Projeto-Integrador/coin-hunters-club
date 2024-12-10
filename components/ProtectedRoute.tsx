@@ -4,6 +4,7 @@ import { Redirect, usePathname } from "expo-router";
 import { PropsWithChildren, useEffect, useState } from "react";
 import { Text } from "react-native";
 import Loading from "./ui/Loading";
+import headerConfig from "@/helper/headerConfig";
 
 interface Props extends PropsWithChildren {}
 
