@@ -6,6 +6,7 @@ import { StyleSheet, View, Text } from "react-native";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import headerConfig from "@/helper/headerConfig";
 import { useAuth } from "@/context/authContext";
+import { Picker } from "@react-native-picker/picker";
 
 export default function IndexEmpresa() {
     const [user, loading] = useAuth();

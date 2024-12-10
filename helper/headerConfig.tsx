@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 
 interface HeaderConfigParams {
     title?: string;
-    headerRight?: () => React.JSX.Element;
+    headerRight?: () => React.JSX.Element | null;
     show?: boolean;
 }
 

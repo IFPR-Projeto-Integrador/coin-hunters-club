@@ -3,10 +3,11 @@ import { StyleSheet } from "react-native";
 
 export const StdStyles = StyleSheet.create({
     mainContainer: {
-        flex: 1,
         justifyContent: 'flex-start',
         alignItems: 'center',
         backgroundColor: Colors.background,
+        position: "relative",
+        zIndex: 0,
     },
 
     secondaryContainer: {

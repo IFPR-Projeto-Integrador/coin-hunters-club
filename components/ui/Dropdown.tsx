@@ -28,7 +28,11 @@ export default function Dropdown({
   ...rest
 }: DropdownProps) {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
-  const toggleDropdown = () => setDropdownVisible((prev) => !prev);
+  const toggleDropdown = () => {
+    console.log("Cliquei");
+    setDropdownVisible(!isDropdownVisible);
+    
+  };
 
   const handleSelect = (value: string | number) => {
     onSelect(value);
@@ -36,7 +40,7 @@ export default function Dropdown({
   };
 
   return (
-    <View style={style} {...rest}>
+    <View style={[{ backgroundColor: "red", zIndex: 9999, position: "relative", },style]} {...rest}>
       <TouchableOpacity style={styles.dropdownButton} onPress={toggleDropdown}>
         { icon ? <Icon name={icon} /> : <Text style={styles.placeholder}>{placeholder}</Text> }
       </TouchableOpacity>
@@ -68,6 +72,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 1000,
   },
   placeholder: {
     fontSize: 16,
@@ -75,6 +80,7 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     backgroundColor: Colors.primary,
+    zIndex: 9999,
     borderWidth: 1,
     borderColor: "transparent",
     marginTop: 5,
@@ -82,8 +88,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     minWidth: 150,
     width: "100%",
-    top: 40,
-    right: 0,
+    top: 0,
+    //right: 0,
   },
   option: {
     padding: 10,
