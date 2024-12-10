@@ -1,4 +1,5 @@
-import db from "@/Firebase/config"
+import db from "@/firebase/config"
+import { router } from "expo-router";
 import { FirebaseError } from "firebase/app";
 
 export enum UserType {
@@ -32,6 +33,15 @@ export async function getLoggedUser(): Promise<CHCUser | null> {
     return usuario.docs.map((doc) => doc.data() as CHCUser)[0];
 }
 
+export async function getUser(id: string): Promise<CHCUser | null> {
+    const usuariosCollection = db.collection(db.store, "usuarios");
+
+    const usuarioQuery = db.query(usuariosCollection, db.where(db.documentId(), "==", id));
+    const usuario = await db.getDocs(usuarioQuery);
+
+    return usuario.docs.map((doc) => doc.data() as CHCUser)[0];
+}
+
 export async function getAllUsers() {
     const usuariosCollection = db.collection(db.store, "usuarios");
     // Select only name and email fields
@@ -40,34 +50,19 @@ export async function getAllUsers() {
     return usuarios.docs.map((doc) => doc.data() as CHCUser);
 }
 
-export enum LoginError {
+export enum AuthError {
     INVALID_CREDENTIALS = "auth/invalid", INVALID_EMAIL = "auth/invalid-email", USER_NOT_FOUND = "auth/user-not-found", EMAIL_EXISTS = "auth/email-already-exists",
     INVALID_PASSWORD = "auth/invalid-password", INVALID_CREDENTIAL = "auth/invalid-credential", UNKNOWN = "unknown"
 }
 
-export async function login(email: string, senha: string): Promise<CHCUser | LoginError> {
+export async function login(email: string, senha: string): Promise<CHCUser | AuthError> {
     try {
         await db.signInWithEmailAndPassword(db.auth, email, senha);
 
         return await getLoggedUser() as CHCUser;
     } catch (error) {
         if (error instanceof FirebaseError) {
-            switch (error.code) {
-                case LoginError.INVALID_CREDENTIALS:
-                    return LoginError.INVALID_CREDENTIALS;
-                case LoginError.INVALID_EMAIL:
-                    return LoginError.INVALID_EMAIL;
-                case LoginError.USER_NOT_FOUND:
-                    return LoginError.USER_NOT_FOUND;
-                case LoginError.EMAIL_EXISTS:
-                    return LoginError.EMAIL_EXISTS;
-                case LoginError.INVALID_PASSWORD:
-                    return LoginError.INVALID_PASSWORD;
-                case LoginError.INVALID_CREDENTIAL:
-                    return LoginError.INVALID_CREDENTIAL;
-                default:
-                    return LoginError.UNKNOWN;
-            }
+            return codeToError(error.code);
         }
     }
 
@@ -85,12 +80,17 @@ export async function logout() {
     }
 }
 
-export async function register({login, nome, email, senha, dtNascimento, cpfCnpj, tipoUsuario}: CHCUser & RegisterInformation) {
+export async function register({login, nome, email, senha, dtNascimento, cpfCnpj, tipoUsuario}: CHCUser & RegisterInformation):
+    Promise<CHCUser | AuthError> {
     try {
         const userCredential = await db.createUserWithEmailAndPassword(db.auth, email, senha);
         const authUser = userCredential.user;
 
-        const dbUser = {
+        if (authUser.email === null) {
+            throw new Error("Email was null during 'register'.");
+        }
+
+        const dbUser: CHCUser = {
             email: authUser.email,
             login: login,
             nome,
@@ -101,10 +101,50 @@ export async function register({login, nome, email, senha, dtNascimento, cpfCnpj
 
         await db.setDoc(db.doc(db.store, "usuarios", authUser.uid), dbUser);
 
-        console.log("User registered:", authUser);
+        return dbUser;
     } catch (error) {
         if (error instanceof FirebaseError) {
-            console.error("Error registering user:", error.message);
+            return codeToError(error.code);
         }
+    }
+
+    throw new Error("'register' function should not reach this point");
+}
+
+function codeToError(errorCode: string): AuthError {
+    switch (errorCode) {
+        case AuthError.INVALID_CREDENTIALS:
+            return AuthError.INVALID_CREDENTIALS;
+        case AuthError.INVALID_EMAIL:
+            return AuthError.INVALID_EMAIL;
+        case AuthError.USER_NOT_FOUND:
+            return AuthError.USER_NOT_FOUND;
+        case AuthError.EMAIL_EXISTS:
+            return AuthError.EMAIL_EXISTS;
+        case AuthError.INVALID_PASSWORD:
+            return AuthError.INVALID_PASSWORD;
+        case AuthError.INVALID_CREDENTIAL:
+            return AuthError.INVALID_CREDENTIAL;
+        default:
+            return AuthError.UNKNOWN;
+    }
+}
+
+export function errorToString(error: AuthError): string {
+    switch (error) {
+        case AuthError.INVALID_CREDENTIALS:
+            return "Usuário ou senha inválidos";
+        case AuthError.INVALID_EMAIL:
+            return "Email inválido";
+        case AuthError.USER_NOT_FOUND:
+            return "Usuário não encontrado";
+        case AuthError.EMAIL_EXISTS:
+            return "Email já cadastrado";
+        case AuthError.INVALID_PASSWORD:
+            return "Senha inválida";
+        case AuthError.INVALID_CREDENTIAL:
+            return "Email ou senha incorretos";
+        default:
+            return "Erro desconhecido";
     }
 }

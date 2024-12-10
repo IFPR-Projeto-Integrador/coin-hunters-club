@@ -13,6 +13,6 @@ export function CHCLogo({ width = 300, height = 300}: Props) {
     }
 
     return (
-            <Image source={require('../assets/images/CHC Logo.png')} style={dimensions} />
+            <Image source={require('../../assets/images/CHC Logo.png')} style={dimensions} />
     )
 }

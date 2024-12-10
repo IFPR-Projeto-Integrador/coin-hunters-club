@@ -1,54 +1,55 @@
-import { CHCLogo } from "@/components/CHCLogo";
-import { GoldButton } from "@/components/layout/GoldButton";
+import { CHCLogo } from "@/components/ui/CHCLogo";
+import { GoldButton } from "@/components/ui/GoldButton";
 import { MainView } from "@/components/layout/MainView";
 import { FormInput } from "@/components/ui/FormInput";
 import { StdStyles } from "@/constants/Styles";
 import { useState } from "react";
 import { StyleSheet, View, Text } from "react-native";
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { Colors } from "@/constants/Colors";
-import { CHCUser, LoginError, login as loginUser } from "@/Firebase/usuario/usuario";
+import { CHCUser, AuthError, login as loginUser, errorToString, UserType } from "@/firebase/usuario/usuario";
+import { useAuth } from "@/context/authContext";
+import Loading from "@/components/ui/Loading";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [errors, setErrors] = useState<string[]>([])
+  const [error, setError] = useState<string | null>(null)
+  const [user, loading] = useAuth();
+
+  if (loading) {
+    return <Loading />
+  }
+
+  if (user) {
+    if (user.tipoUsuario == UserType.EMPRESA) {
+      return <Redirect href="/empresa" />;
+    }
+    if (user.tipoUsuario == UserType.CLIENTE) {
+      return <Redirect href="/cliente" />;
+    }
+    if (user.tipoUsuario == UserType.FUNCIONARIO) {
+      return <Redirect href="/funcionario" />;
+    }
+  }
 
   async function handleLogin() {
     const result = await loginUser(email, senha);
 
     if (typeof result == "string") {
-      switch(result) {
-        case LoginError.INVALID_CREDENTIALS:
-          setErrors(["Usuário ou senha inválidos"]);
-          break;
-        case LoginError.INVALID_EMAIL:
-          setErrors(["Email inválido"]);
-          break;
-        case LoginError.USER_NOT_FOUND:
-          setErrors(["Usuário não encontrado"]);
-          break;
-        case LoginError.EMAIL_EXISTS:
-          setErrors(["Email já cadastrado"]);
-          break;
-        case LoginError.INVALID_PASSWORD:
-          setErrors(["Senha inválida"]);
-          break;
-        case LoginError.INVALID_CREDENTIAL:
-          setErrors(["Email ou senha incorretos"]);
-          break;
-        default:
-          setErrors(["Erro desconhecido"]);
-      }
-
+      setError(errorToString(result));
       return
     }
 
-    router.navigate("/");
+    if (result.tipoUsuario == UserType.EMPRESA)
+      router.navigate("/empresa");
+    if (result.tipoUsuario == UserType.CLIENTE)
+      router.navigate("/cliente");
+
   }
 
-  function toForgotPassword() {
-    router.navigate("auth/forgotPassword");
+  function goToForgotPassword() {
+    router.navigate("/auth/forgotPassword");
   }
 
   function goToRegister() {
@@ -59,7 +60,7 @@ export default function LoginScreen() {
     <MainView>
       <CHCLogo />
       <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
-        {errors.map((error, index) => <Text style={styles.errorMessage} key={index}>{error}</Text>)}
+        { error != null && <Text style={styles.errorMessage}>{error}</Text> }
         <FormInput label="Email" setValue={setEmail} value={email} />
         <FormInput label="Senha" setValue={setSenha} value={senha} password />
 
@@ -69,7 +70,7 @@ export default function LoginScreen() {
           style={styles.loginButton}
         />
         
-        <Text style={styles.forgotPassword} onPress={toForgotPassword}>
+        <Text style={styles.forgotPassword} onPress={goToForgotPassword}>
           Esqueceu sua senha?
         </Text>
 

@@ -1,15 +1,16 @@
-import { CHCLogo } from "@/components/CHCLogo";
-import { GoldButton } from "@/components/layout/GoldButton";
+import { CHCLogo } from "@/components/ui/CHCLogo";
+import { GoldButton } from "@/components/ui/GoldButton";
 import { MainView } from "@/components/layout/MainView";
 import { FormInput } from "@/components/ui/FormInput";
 import { StdStyles } from "@/constants/Styles";
-import { RegisterInformation, CHCUser, UserType, register } from "@/Firebase/usuario/usuario";
+import { RegisterInformation, CHCUser, UserType, register, errorToString } from "@/firebase/usuario/usuario";
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import { router } from 'expo-router';
 
 export default function Register() {
     const [tab, setTab] = useState<"cliente" | "empresa">("cliente");
+    const [error, setError] = useState<string | null>(null);
 
     const [login, setLogin] = useState("");
     const [senha, setSenha] = useState("");
@@ -30,7 +31,13 @@ export default function Register() {
             senha
         };
 
-        register(user);
+        const result = register(user);
+
+        if (typeof result == "string") {
+            setError(errorToString(result));
+            return
+        }
+
         router.navigate("/");
     }
 
@@ -42,6 +49,8 @@ export default function Register() {
                     <GoldButton title="Cliente" onPress={() => setTab("cliente")} active={tab === "cliente"} style={[styles.tabButton, { marginRight: 10 }]}></GoldButton>
                     <GoldButton title="Empresa" onPress={() => setTab("empresa")} active={tab === "empresa"} style={styles.tabButton}></GoldButton>
                 </View>
+
+                { error != null && <Text style={styles.errorMessage}>{error}</Text> }
 
                 <FormInput label="Login" setValue={setLogin} value={login}  />
                 <FormInput label="Senha" setValue={setSenha} value={senha} password />
@@ -76,4 +85,8 @@ const styles = StyleSheet.create({
     registerButton: {
         marginTop: 20,
     },
+    errorMessage: {
+        color: "red",
+        fontSize: 16,
+      },
 })

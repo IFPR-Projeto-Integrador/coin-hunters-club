@@ -14,5 +14,6 @@ export const StdStyles = StyleSheet.create({
         justifyContent: 'flex-start',
         backgroundColor: Colors.panel,
         paddingVertical: 15,
+        marginVertical: 15,
     }
 })

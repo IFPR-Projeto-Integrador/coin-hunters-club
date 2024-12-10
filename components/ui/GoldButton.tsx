@@ -42,6 +42,6 @@ const styles = StyleSheet.create({
       backgroundColor: '#cccccc',
     },
     active: {
-        backgroundColor: Colors.primaryActive,
+        backgroundColor: Colors.primaryLighter,
     }
 });
