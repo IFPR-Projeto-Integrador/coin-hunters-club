@@ -3,11 +3,10 @@ import React, { useEffect } from "react";
 
 interface HeaderConfigParams {
     title?: string;
-    headerRight?: () => React.JSX.Element | null;
     show?: boolean;
 }
 
-export default function headerConfig({ title, headerRight, show }: HeaderConfigParams) {
+export default function headerConfig({ title, show }: HeaderConfigParams) {
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -15,10 +14,6 @@ export default function headerConfig({ title, headerRight, show }: HeaderConfigP
 
         if (title) {
           options.headerTitle = title;
-        }
-    
-        if (headerRight) {
-          options.headerRight = headerRight;
         }
 
         if (typeof show == "boolean") {
@@ -30,5 +25,5 @@ export default function headerConfig({ title, headerRight, show }: HeaderConfigP
         }   
     
         navigation.setOptions(options);
-    }, [navigation]);
+    }, [navigation, title, show]);
 }

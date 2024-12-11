@@ -22,6 +22,7 @@ export default function Register() {
 
     function cadastrar() {
         const user: CHCUser & RegisterInformation = {
+            uid: "",
             login,
             nome,
             email,

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, PropsWithChildren } from "react";
 import db from "@/firebase/config"
-import { getUser } from "@/firebase/usuario/usuario";
+import { changeUserEmailRaw, getUser } from "@/firebase/usuario/usuario";
 import { CHCUser } from "@/firebase/usuario/usuario";
 
 interface Props extends PropsWithChildren {}
@@ -22,7 +22,11 @@ export const AuthProvider = ({ children }: Props) => {
             if (user == null) {
                 getUser(currentUser.uid)
                     .then(loggedUser => {
-                        setUser(loggedUser);
+                        if (loggedUser?.email != currentUser.email && currentUser.email != null) {
+                            changeUserEmailRaw(currentUser.email)
+                        }
+
+                        setUser({ ...loggedUser, firestoreUser: currentUser } as CHCUser);
                         setLoading(false);
                     })
                     .catch(error => console.error('Error getting user', error));

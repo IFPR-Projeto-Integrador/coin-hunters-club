@@ -1,6 +1,6 @@
 import { Colors } from '@/constants/Colors';
 import React, { useState } from 'react';
-import { TextInput, StyleSheet, View, Text, TextInputBase } from 'react-native';
+import { TextInput, StyleSheet, View, Text, TextInputBase, ViewProps } from 'react-native';
 
 interface Props {
     label: string;
@@ -8,9 +8,10 @@ interface Props {
     value: string;
     password?: boolean;
     placeholder?: string;
+    inputBackgroundColor?: string;
 };
 
-export function FormInput({ placeholder, label, value, setValue, password = false }: Props) {
+export function FormInput({ placeholder, label, value, setValue, inputBackgroundColor, password = false }: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label ?? ""}</Text>
@@ -19,7 +20,7 @@ export function FormInput({ placeholder, label, value, setValue, password = fals
         value={value ?? ""}
         onChangeText={setValue}
         placeholder={placeholder ?? "Digite algo..."}
-        style={styles.input}
+        style={[styles.input, inputBackgroundColor && { backgroundColor: inputBackgroundColor }]}
       />
     </View>
   );

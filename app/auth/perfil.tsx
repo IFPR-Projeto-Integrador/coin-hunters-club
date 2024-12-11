@@ -1,24 +1,29 @@
 import { MainView } from "@/components/layout/MainView";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import Root from "@/components/Root";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { StdStyles } from "@/constants/Styles";
 import { useAuth } from "@/context/authContext";
 import { UserType } from "@/firebase/usuario/usuario";
 import headerConfig from "@/helper/headerConfig";
+import { router } from "expo-router";
 import { Text, View, StyleSheet } from "react-native";
 
 
 export default function Perfil() {
-    const [user, loading] = useAuth();
+    const [user, loading] = useAuth();  
+
+    headerConfig({ title: user?.nome ?? "Perfil" });
 
     if (loading) {
         return null;
     }
 
-    headerConfig({ title: user?.nome ?? "Perfil", headerRight: () => null });
+    function onClickEditButton() {
+        router.navigate("/auth/editPerfil");
+    }
 
     return (
-        <ProtectedRoute>
+        <Root requireAuth={true} showAccountButton={true} editButton={[true, { onPress: onClickEditButton }]}>
             <MainView>
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
                     <Text style={styles.label}>Nome:</Text>
@@ -29,7 +34,7 @@ export default function Perfil() {
                     <Text style={styles.info}>{user?.cpfCnpj}</Text>
                 </View>
             </MainView>
-        </ProtectedRoute>
+        </Root>
     )
 }
 

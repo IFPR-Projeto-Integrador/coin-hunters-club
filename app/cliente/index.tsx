@@ -1,11 +1,11 @@
-import ProtectedRoute from "@/components/ProtectedRoute";
+import Root from "@/components/Root";
 import { Text } from "react-native"
 
 export default function IndexCliente() {
     
     return (
-        <ProtectedRoute>
+        <Root requireAuth={true}>
             <Text>Cliente</Text>
-        </ProtectedRoute>
+        </Root>
     )
 }

@@ -6,9 +6,6 @@ import { router, Stack, usePathname } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
-import { Picker } from "@react-native-picker/picker";
-import IconButton from '@/components/ui/IconButton';
-import { Button } from 'react-native';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,6 +33,14 @@ export default function RootLayout() {
           headerTitle: "Perfil",
           ...indexHeader
           }}/>
+          <Stack.Screen name="auth/editPerfil" options={{
+          headerTitle: "Editar Perfil",
+          ...indexHeader
+          }}/>
+        <Stack.Screen name="auth/emailVerification" options={{
+          headerTitle: "Verificar Senha",
+          ...indexHeader
+          }}/>
         
         <Stack.Screen name="empresa/index" options={{ 
           headerTitle: "Empresa",
@@ -55,23 +60,4 @@ const indexHeader = {
   headerTitleAlign: "center" as "center",
   headerTintColor: Colors.fontColor,
   headerStyle: { backgroundColor: Colors.primary },
-  headerRight: () => (
-    <Button title="teste" onPress={() => console.log("Batata")}/>
-    // <Dropdown 
-    //   onSelect={async (value) => {
-    //     if (value === "perfil") {
-    //       router.navigate(`/auth/perfil`);
-    //     } else {
-    //       await logout();
-    //       router.navigate("/");
-    //     }
-    //   }} 
-    //   items={[{label: "Perfil", value: "perfil"}, {label: "Logout", value: "logout"}]} 
-    //   icon="bars" 
-    //   style={{
-    //     marginRight: Platform.OS === "web" ? 20 : 0,
-    //     width: 64
-    //   }}
-    //   />
-  )
 }

@@ -1,11 +1,12 @@
 import { Colors } from "@/constants/Colors";
-import React, { ComponentType, ReactNode, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Modal,
   ViewProps,
 } from "react-native";
 import Icon from "@expo/vector-icons/FontAwesome";
@@ -27,40 +28,50 @@ export default function Dropdown({
   style,
   ...rest
 }: DropdownProps) {
-  const [isDropdownVisible, setDropdownVisible] = useState(false);
-  const toggleDropdown = () => {
-    console.log("Cliquei");
-    setDropdownVisible(!isDropdownVisible);
-    
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
   };
 
   const handleSelect = (value: string | number) => {
     onSelect(value);
-    setDropdownVisible(false);
+    setModalVisible(false);
   };
 
   return (
-    <View style={[{ backgroundColor: "red", zIndex: 9999, position: "relative", },style]} {...rest}>
-      <TouchableOpacity style={styles.dropdownButton} onPress={toggleDropdown}>
-        { icon ? <Icon name={icon} /> : <Text style={styles.placeholder}>{placeholder}</Text> }
+    <View style={[style]} {...rest}>
+      <TouchableOpacity style={styles.dropdownButton} onPress={toggleModal}>
+        {icon ? (
+          <Icon name={icon} size={20} color={Colors.fontColor} />
+        ) : (
+          <Text style={styles.placeholder}>{placeholder}</Text>
+        )}
       </TouchableOpacity>
 
-      {isDropdownVisible && (
-        <View style={styles.dropdown}>
-          <FlatList
-            data={items}
-            keyExtractor={(item) => item.value.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.option}
-                onPress={() => handleSelect(item.value)}
-              >
-                <Text style={styles.optionText}>{item.label}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-      )}
+      <Modal
+        visible={isModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={toggleModal}
+      >
+        <TouchableOpacity style={styles.modalOverlay} onPress={toggleModal}>
+          <View style={styles.modalContent}>
+            <FlatList
+              data={items}
+              keyExtractor={(item) => item.value.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.option}
+                  onPress={() => handleSelect(item.value)}
+                >
+                  <Text style={styles.optionText}>{item.label}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -72,31 +83,31 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 1000,
   },
   placeholder: {
     fontSize: 16,
     color: Colors.fontColor,
   },
-  dropdown: {
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
     backgroundColor: Colors.primary,
-    zIndex: 9999,
-    borderWidth: 1,
-    borderColor: "transparent",
-    marginTop: 5,
-    maxHeight: 150,
-    position: "absolute",
-    minWidth: 150,
-    width: "100%",
-    top: 0,
-    //right: 0,
+    borderRadius: 8,
+    padding: 10,
+    width: 250,
+    maxHeight: 300,
   },
   option: {
     padding: 10,
-    paddingVertical: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.primaryDarker,
   },
   optionText: {
-    padding: 10,
-    backgroundColor: Colors.primaryLighter,
-  }
+    fontSize: 16,
+    color: Colors.fontColor,
+  },
 });

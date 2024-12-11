@@ -3,7 +3,7 @@ import { MainView } from "@/components/layout/MainView";
 import { StdStyles } from "@/constants/Styles";
 import { router } from "expo-router";
 import { StyleSheet, View, Text } from "react-native";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import Root from "@/components/Root";
 import headerConfig from "@/helper/headerConfig";
 import { useAuth } from "@/context/authContext";
 import { Picker } from "@react-native-picker/picker";
@@ -11,14 +11,16 @@ import { Picker } from "@react-native-picker/picker";
 export default function IndexEmpresa() {
     const [user, loading] = useAuth();
 
+    console.log(user);
+
+    headerConfig({ title: user?.nome ?? "Empresa" });
+
     if (loading) {
         return null;
     }
 
-    headerConfig({ title: user?.nome ?? "Empresa" });
-
     return (
-        <ProtectedRoute>
+        <Root requireAuth={true}>
             <MainView>
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
                     <GoldButton title="Recompensas" onPress={() => router.navigate("")} style={[styles.button]}/>
@@ -26,7 +28,7 @@ export default function IndexEmpresa() {
                     <GoldButton title="Funcionários" onPress={() => router.navigate("")} style={[styles.button]}/>  
                 </View>
             </MainView>
-        </ProtectedRoute>
+        </Root>
     )
 }
 
