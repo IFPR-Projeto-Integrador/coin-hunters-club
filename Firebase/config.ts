@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, getDocs, addDoc, deleteDoc, setDoc, updateDoc, documentId, where, query, doc, getDoc } from "firebase/firestore";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, updateEmail, updatePassword, sendEmailVerification,
-    reauthenticateWithCredential, EmailAuthProvider
+    reauthenticateWithCredential, EmailAuthProvider, deleteUser
  } from "firebase/auth";
 
 // Optionally import the services that you want to use
@@ -46,6 +46,7 @@ const db = {
     reauthenticateWithCredential,
     EmailAuthProvider,
     sendEmailVerification,
+    deleteUser,
 }
 
 export default db;

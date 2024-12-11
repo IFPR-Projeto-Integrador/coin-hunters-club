@@ -6,14 +6,15 @@ interface ButtonProps extends TouchableOpacityProps {
   title: string;
   onPress: () => void;
   active?: boolean;
+  danger?: boolean;
   textStyle?: TextStyle;
   disabled?: boolean;
 }
 
-export function GoldButton ({ title, onPress, textStyle, disabled = false, active = false, style, ...toucheableOpacity }: ButtonProps) {
+export function GoldButton ({ title, onPress, textStyle, disabled = false, active = false, danger = false, style, ...toucheableOpacity }: ButtonProps) {
     return (
         <TouchableOpacity
-        style={[styles.button, style, disabled && styles.disabled, active && styles.active]}
+        style={[styles.button, style, disabled && styles.disabled, active && styles.active, danger && styles.danger]}
         { ...toucheableOpacity }
         onPress={onPress}
         disabled={disabled}
@@ -40,6 +41,9 @@ const styles = StyleSheet.create({
     },
     disabled: {
       backgroundColor: '#cccccc',
+    },
+    danger: {
+      backgroundColor: Colors.error
     },
     active: {
         backgroundColor: Colors.primaryLighter,

@@ -5,7 +5,7 @@ import { GoldButton } from "@/components/ui/GoldButton";
 import { Colors } from "@/constants/Colors";
 import { StdStyles } from "@/constants/Styles";
 import { useAuth } from "@/context/authContext";
-import { AuthError, editUserEmailAndPassword, errorToString, UserType } from "@/firebase/usuario/usuario";
+import { AuthError, deleteUser, editUserEmailAndPassword, errorToString, UserType } from "@/firebase/usuario/usuario";
 import headerConfig from "@/helper/headerConfig";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -41,6 +41,22 @@ export default function EditPerfil() {
         router.navigate("/auth/perfil");
     }
 
+    async function deleteAccount() {
+        if (confirmarSenha.length == 0) {
+            setErro("Digite sua senha atual");
+            return;
+        }
+
+        const result = await deleteUser(confirmarSenha)
+
+        if (typeof result === "string") {
+            setErro(errorToString(result));
+            return;
+        }
+
+        router.navigate("/");
+    }
+
     return (
         <Root requireAuth={true} showAccountButton={false}>
             <MainView>
@@ -49,7 +65,8 @@ export default function EditPerfil() {
                     <FormInput label="Email" value={email} setValue={setEmail}/>
                     <FormInput label="Senha" value={senha} setValue={setSenha} password inputBackgroundColor={senha.length == 0 ? undefined : Colors.primaryLighter }/>
                     <FormInput label="Senha atual" value={confirmarSenha} setValue={setConfirmarSenha} password/>
-                    <GoldButton title="Editar" onPress={onEdit}/>
+                    <GoldButton title="Editar" onPress={onEdit} style={styles.button}/>
+                    <GoldButton title="Deletar Conta" onPress={deleteAccount} danger/>
                 </View>
             </MainView>
         </Root>
@@ -71,5 +88,9 @@ const styles = StyleSheet.create({
     },
     error: {
         color: "red",
+    },
+    button: {
+        marginVertical: 20,
     }
+    
 });

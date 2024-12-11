@@ -19,7 +19,7 @@ export default function LoginScreen() {
 
   if (loading) {
     return <Loading />
-  }
+  }  
 
   if (user) {
     if (user.tipoUsuario == UserType.EMPRESA) {

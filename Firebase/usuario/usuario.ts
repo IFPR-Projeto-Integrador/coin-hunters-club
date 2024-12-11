@@ -124,6 +124,32 @@ export async function register({login, nome, email, senha, dtNascimento, cpfCnpj
     throw new Error("'register' function should not reach this point");
 }
 
+export async function deleteUser(password: string): Promise<AuthError | undefined> {
+    try {
+        debugger;
+        const user = db.auth.currentUser;
+    
+        if (!user) {
+            return;
+        }
+    
+        const userDocRef = db.doc(db.store, "usuarios", user.uid);
+
+        await reAuth(user, password);
+
+        await db.deleteDoc(userDocRef);
+        await db.deleteUser(user);
+
+        return;
+    } catch (error) {
+        if (error instanceof FirebaseError) {
+            return codeToError(error.code);
+        }
+    }
+
+    throw new Error("Could not delete user");
+}
+
 export async function editUserEmailAndPassword(
     userId: string,
     currentPassword: string,
@@ -137,8 +163,7 @@ export async function editUserEmailAndPassword(
             throw new Error("User not authenticated or incorrect user ID.");
         }
 
-        const credential = db.EmailAuthProvider.credential(user.email!, currentPassword);
-        await db.reauthenticateWithCredential(user, credential);
+        reAuth(user, currentPassword);
     
         if (user.email != newEmail && newEmail) {
             await db.updateEmail(user, newEmail);
@@ -155,7 +180,6 @@ export async function editUserEmailAndPassword(
     
         return await getUser(userId) as CHCUser;
     } catch (error) {
-        console.log(error);
         if (error instanceof FirebaseError) {
             return codeToError(error.code);
         } else {
@@ -232,6 +256,11 @@ function codeToError(errorCode: string): AuthError {
         default:
             return AuthError.UNKNOWN;
     }
+}
+
+async function reAuth(user: User, password: string) {
+    const credential = db.EmailAuthProvider.credential(user.email!, password);
+    await db.reauthenticateWithCredential(user, credential);
 }
 
 export function errorToString(error: AuthError): string {

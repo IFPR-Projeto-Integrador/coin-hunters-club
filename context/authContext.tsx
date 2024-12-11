@@ -18,8 +18,6 @@ export const AuthProvider = ({ children }: Props) => {
                 setLoading(false);
                 return;
             }
-
-            console.log("Aqui: ", user);
             
             getUser(currentUser.uid)
                 .then(loggedUser => {
