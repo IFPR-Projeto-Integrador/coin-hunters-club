@@ -10,4 +10,5 @@ export const Colors = {
   primaryLighter: "#FCE9AA",
   primaryDarker: "#F9A809",
   fontColor: "#000",
+  error: "#EA3103",
 };

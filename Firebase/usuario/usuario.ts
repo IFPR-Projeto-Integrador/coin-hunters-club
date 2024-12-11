@@ -64,7 +64,8 @@ export async function getAllUsers() {
 
 export enum AuthError {
     INVALID_EMAIL = "auth/invalid-email", USER_NOT_FOUND = "auth/user-not-found", EMAIL_EXISTS = "auth/email-already-exists",
-    INVALID_PASSWORD = "auth/invalid-password", INVALID_CREDENTIAL = "auth/invalid-credential", WEAK_PASSWORD = "auth/weak-password", UNKNOWN = "unknown"
+    INVALID_PASSWORD = "auth/invalid-password", INVALID_CREDENTIAL = "auth/invalid-credential", WEAK_PASSWORD = "auth/weak-password", 
+    WRONG_PASSWORD = "auth/wrong-password", UNKNOWN = "unknown"
 }
 
 export async function login(email: string, senha: string): Promise<CHCUser | AuthError> {
@@ -226,6 +227,8 @@ function codeToError(errorCode: string): AuthError {
             return AuthError.INVALID_CREDENTIAL;
         case AuthError.WEAK_PASSWORD:
             return AuthError.WEAK_PASSWORD;
+        case AuthError.WRONG_PASSWORD:
+            return AuthError.WRONG_PASSWORD;
         default:
             return AuthError.UNKNOWN;
     }
@@ -245,6 +248,8 @@ export function errorToString(error: AuthError): string {
             return "Email ou senha incorretos";
         case AuthError.WEAK_PASSWORD:
             return "Senha fraca";
+        case AuthError.WRONG_PASSWORD:
+            return "Senha incorreta";
         default:
             return "Erro desconhecido";
     }

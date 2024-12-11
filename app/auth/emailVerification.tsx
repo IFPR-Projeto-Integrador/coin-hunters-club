@@ -4,9 +4,10 @@ import { StdStyles } from "@/constants/Styles";
 import { StyleSheet, Text, View } from "react-native";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { useState } from "react";
-import { sendConfirmationEmail } from "@/firebase/usuario/usuario";
+import { logout, sendConfirmationEmail } from "@/firebase/usuario/usuario";
 import { useAuth } from "@/context/authContext";
 import Loading from "@/components/ui/Loading";
+import { router } from "expo-router";
 
 
 export default function EmailVerification() {
@@ -25,13 +26,19 @@ export default function EmailVerification() {
         }
     }
 
+    async function goToLogin() {
+        await logout();
+        router.navigate("/");
+    }
+
     return (
-        <Root>
+        <Root showAccountButton={false}>
             <MainView>
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
-                    <Text>Verificação de Email</Text>
-                    <Text>Clique no botão abaixo para enviar um email de confirmação.</Text>
-                    <GoldButton title="Enviar Email" onPress={onSendEmail}/>
+                    <Text style={styles.verifyEmail}>Verificação de Email</Text>
+                    <Text style={styles.descriptionText}>Clique no botão abaixo para enviar um email de confirmação. O email deve ser confirmado antes que possa prosseguir.</Text>
+                    <GoldButton title="Enviar Email" onPress={onSendEmail} style={[styles.sendEmailButton, styles.button]}/>
+                    <GoldButton title="Logar Novamente" onPress={goToLogin} style={[styles.button]}/>
                 </View>
             </MainView>
         </Root>
@@ -48,5 +55,16 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: "center",
         marginBottom: 20,
+        fontWeight: "bold",
+    },
+    descriptionText: {
+        textAlign: "center",
+        marginBottom: 20,
+    },
+    sendEmailButton: {
+        marginBottom: 20,
+    },
+    button: {
+        width: "100%",
     }
 });

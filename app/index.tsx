@@ -41,6 +41,8 @@ export default function LoginScreen() {
       return
     }
 
+    
+
     if (result.tipoUsuario == UserType.EMPRESA)
       router.navigate("/empresa");
     if (result.tipoUsuario == UserType.CLIENTE)

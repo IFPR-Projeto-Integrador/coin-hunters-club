@@ -18,19 +18,19 @@ export const AuthProvider = ({ children }: Props) => {
                 setLoading(false);
                 return;
             }
-            
-            if (user == null) {
-                getUser(currentUser.uid)
-                    .then(loggedUser => {
-                        if (loggedUser?.email != currentUser.email && currentUser.email != null) {
-                            changeUserEmailRaw(currentUser.email)
-                        }
 
-                        setUser({ ...loggedUser, firestoreUser: currentUser } as CHCUser);
-                        setLoading(false);
-                    })
-                    .catch(error => console.error('Error getting user', error));
-            }
+            console.log("Aqui: ", user);
+            
+            getUser(currentUser.uid)
+                .then(loggedUser => {
+                    if (loggedUser?.email != currentUser.email && currentUser.email != null) {
+                        changeUserEmailRaw(currentUser.email)
+                    }
+
+                    setUser({ ...loggedUser, firestoreUser: currentUser } as CHCUser);
+                    setLoading(false);
+                })
+                .catch(error => console.error('Error getting user', error));
 
         });
 

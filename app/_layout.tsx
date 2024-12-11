@@ -38,7 +38,7 @@ export default function RootLayout() {
           ...indexHeader
           }}/>
         <Stack.Screen name="auth/emailVerification" options={{
-          headerTitle: "Verificar Senha",
+          headerTitle: "Verificação",
           ...indexHeader
           }}/>
         

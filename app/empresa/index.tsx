@@ -11,8 +11,6 @@ import { Picker } from "@react-native-picker/picker";
 export default function IndexEmpresa() {
     const [user, loading] = useAuth();
 
-    console.log(user);
-
     headerConfig({ title: user?.nome ?? "Empresa" });
 
     if (loading) {
