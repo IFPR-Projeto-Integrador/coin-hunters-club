@@ -8,6 +8,8 @@ import { Picker } from "@react-native-picker/picker";
 import Dropdown from "./ui/Dropdown";
 import IconButton from "./ui/IconButton";
 import { Colors } from "@/constants/Colors";
+import React from "react";
+import { Paths } from "@/constants/Paths";
 
 interface EditButtonConfig {
     onPress: () => void;
@@ -15,35 +17,33 @@ interface EditButtonConfig {
 
 interface Props extends PropsWithChildren {
     requireAuth?: boolean;
-    showAccountButton?: boolean;
-    editButton?: [boolean, EditButtonConfig | null];
+    accountButton?: boolean;
+    editButton?: EditButtonConfig | null;
 }
 
-export default function Root({ children, requireAuth = false, showAccountButton = true, editButton = [false, null] }: Props) {
+export default function Root({ children, requireAuth = false, accountButton = true, editButton = null }: Props) {
     const [user, loading] = useAuth();
-
-    const [showEditButton, editButtonConfig] = editButton;
 
     if (loading) {
         return <Loading />;
     }
 
     if (!user && requireAuth) {
-        return <Redirect href="/" />;
+        return <Redirect href={Paths.LOGIN} />;
     }
 
     if (requireAuth && user?.firestoreUser?.emailVerified === false) {
-        return <Redirect href="/auth/emailVerification" />;
+        return <Redirect href={Paths.EMAIL_VERIFICATION} />;
     }
 
     async function valueChanged(value: string | number) {
         switch (value) {
             case "perfil":
-                router.navigate("/auth/perfil");
+                router.navigate(Paths.PROFILE);
                 return
             case "logout":
                 await logout();
-                router.navigate("/");
+                router.navigate(Paths.LOGIN);
                 return;
         }
 
@@ -52,13 +52,13 @@ export default function Root({ children, requireAuth = false, showAccountButton 
     return (
         <>
             {children}
-            {showAccountButton && <Dropdown 
+            {accountButton && <Dropdown 
                                 style={styles.pickerLeft} 
                                 onSelect={valueChanged} 
                                 icon="user"
                                 items={[{ label: "Perfil", value: "perfil" }, { label: "Logout", value: "logout" }]}
                                 />}
-            { showEditButton && <IconButton icon="pencil" style={styles.pickerRight} onPress={editButtonConfig?.onPress}/>}
+            { editButton != null && <IconButton icon="pencil" style={styles.pickerRight} onPress={editButton?.onPress}/>}
         </>
     );
 }

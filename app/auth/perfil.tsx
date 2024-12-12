@@ -1,6 +1,7 @@
 import { MainView } from "@/components/layout/MainView";
 import Root from "@/components/Root";
 import { GoldButton } from "@/components/ui/GoldButton";
+import { Paths } from "@/constants/Paths";
 import { StdStyles } from "@/constants/Styles";
 import { useAuth } from "@/context/authContext";
 import { UserType } from "@/firebase/usuario/usuario";
@@ -19,11 +20,11 @@ export default function Perfil() {
     }
 
     function onClickEditButton() {
-        router.navigate("/auth/editPerfil");
+        router.navigate(Paths.EDIT_PROFILE);
     }
 
     return (
-        <Root requireAuth={true} showAccountButton={true} editButton={[true, { onPress: onClickEditButton }]}>
+        <Root requireAuth={true} accountButton editButton={{ onPress: onClickEditButton }}>
             <MainView>
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
                     <Text style={styles.label}>Nome:</Text>

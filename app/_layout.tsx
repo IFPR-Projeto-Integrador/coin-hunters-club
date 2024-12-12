@@ -29,6 +29,7 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="auth/forgotPassword" options={{ headerShown: false }}/>
         <Stack.Screen name="auth/register" options={{ headerShown: false }}/>
+        <Stack.Screen name="auth/login" options={{ headerShown: false }}/>
         <Stack.Screen name="auth/perfil" options={{
           headerTitle: "Perfil",
           ...indexHeader
@@ -46,9 +47,13 @@ export default function RootLayout() {
           headerTitle: "Empresa",
           ...indexHeader,
           }} />
+
         <Stack.Screen name="cliente/index" options={{ headerShown: true }}/>
 
-        <Stack.Screen name="index" options={{ headerShown: false }}/>
+        <Stack.Screen name="index" options={{ 
+          headerTitle: "Empresa",
+          ...indexHeader,
+          }} />
         <Stack.Screen name="+not-found" options={{ headerShown: false }}/>
       </Stack>
     </AuthProvider>

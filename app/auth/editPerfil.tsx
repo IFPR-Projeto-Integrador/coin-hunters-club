@@ -3,6 +3,7 @@ import Root from "@/components/Root";
 import { FormInput } from "@/components/ui/FormInput";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { Colors } from "@/constants/Colors";
+import { Paths } from "@/constants/Paths";
 import { StdStyles } from "@/constants/Styles";
 import { useAuth } from "@/context/authContext";
 import { AuthError, deleteUser, editUserEmailAndPassword, errorToString, UserType } from "@/firebase/usuario/usuario";
@@ -38,7 +39,7 @@ export default function EditPerfil() {
             return;
         }
 
-        router.navigate("/auth/perfil");
+        router.navigate(Paths.PROFILE);
     }
 
     async function deleteAccount() {
@@ -54,11 +55,11 @@ export default function EditPerfil() {
             return;
         }
 
-        router.navigate("/");
+        router.navigate(Paths.LOGIN);
     }
 
     return (
-        <Root requireAuth={true} showAccountButton={false}>
+        <Root requireAuth={true} accountButton={false}>
             <MainView>
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
                     { erro != null && <Text style={styles.error}>{erro}</Text> }

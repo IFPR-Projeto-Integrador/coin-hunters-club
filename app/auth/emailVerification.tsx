@@ -8,6 +8,7 @@ import { logout, sendConfirmationEmail } from "@/firebase/usuario/usuario";
 import { useAuth } from "@/context/authContext";
 import Loading from "@/components/ui/Loading";
 import { router } from "expo-router";
+import { Paths } from "@/constants/Paths";
 
 
 export default function EmailVerification() {
@@ -28,11 +29,11 @@ export default function EmailVerification() {
 
     async function goToLogin() {
         await logout();
-        router.navigate("/");
+        router.navigate(Paths.LOGIN);
     }
 
     return (
-        <Root showAccountButton={false}>
+        <Root accountButton={false}>
             <MainView>
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
                     <Text style={styles.verifyEmail}>Verificação de Email</Text>

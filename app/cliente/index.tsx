@@ -4,8 +4,6 @@ import { Text } from "react-native"
 export default function IndexCliente() {
     
     return (
-        <Root requireAuth={true}>
-            <Text>Cliente</Text>
-        </Root>
+        <Text>Cliente</Text>
     )
 }

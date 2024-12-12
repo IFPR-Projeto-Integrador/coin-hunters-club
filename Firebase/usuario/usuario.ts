@@ -24,6 +24,12 @@ export interface RegisterInformation {
     senha: string;
 }
 
+export enum AuthError {
+    INVALID_EMAIL = "auth/invalid-email", USER_NOT_FOUND = "auth/user-not-found", EMAIL_EXISTS = "auth/email-already-exists",
+    INVALID_PASSWORD = "auth/invalid-password", INVALID_CREDENTIAL = "auth/invalid-credential", WEAK_PASSWORD = "auth/weak-password", 
+    WRONG_PASSWORD = "auth/wrong-password", UNKNOWN = "unknown"
+}
+
 export async function getLoggedUser(): Promise<CHCUser | null> {
     if (db.auth.currentUser === null) {
         return null;
@@ -60,12 +66,6 @@ export async function getAllUsers() {
         const data = doc.data();
         return { ...data, uid: doc.id } as CHCUser
     });
-}
-
-export enum AuthError {
-    INVALID_EMAIL = "auth/invalid-email", USER_NOT_FOUND = "auth/user-not-found", EMAIL_EXISTS = "auth/email-already-exists",
-    INVALID_PASSWORD = "auth/invalid-password", INVALID_CREDENTIAL = "auth/invalid-credential", WEAK_PASSWORD = "auth/weak-password", 
-    WRONG_PASSWORD = "auth/wrong-password", UNKNOWN = "unknown"
 }
 
 export async function login(login: string, senha: string): Promise<CHCUser | AuthError> {
