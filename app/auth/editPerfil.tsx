@@ -6,11 +6,11 @@ import { Colors } from "@/constants/Colors";
 import { Paths } from "@/constants/Paths";
 import { StdStyles } from "@/constants/Styles";
 import { useAuth } from "@/context/authContext";
-import { AuthError, deleteUser, editUserEmailAndPassword, errorToString, UserType } from "@/firebase/usuario/usuario";
+import { AuthError, deleteUser, editUserEmailAndPassword, errorToString, logout, UserType } from "@/firebase/usuario/usuario";
 import headerConfig from "@/helper/headerConfig";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, Alert } from "react-native";
 
 
 export default function EditPerfil() {
@@ -64,17 +64,18 @@ export default function EditPerfil() {
             setErro(errors);
             return;
         }
-        
+
         const result = await editUserEmailAndPassword(user?.uid ?? "", confirmarSenha, email, senha);
 
         if (typeof result === "string") {
-            if (result === AuthError.INVALID_CREDENTIAL)
+            if (result === AuthError.INVALID_CREDENTIAL || result === AuthError.WRONG_PASSWORD)
                 setErro(["Senha atual incorreta"]);
             else 
                 setErro([errorToString(result)]);
             return;
         }
 
+        await logout();
         router.navigate(Paths.PROFILE);
     }
 
@@ -86,14 +87,29 @@ export default function EditPerfil() {
             return;
         }
 
-        const result = await deleteUser(confirmarSenha)
+        Alert.alert(
+            'Confirmação de deleção de conta',
+            'Você tem certeza que deseja deletar sua conta? Essa ação é irreversível.',
+            [
+                {
+                    text: 'Cancelar',
+                },
+                { 
+                    text: 'Sim', 
+                    onPress: async () => {
+                        const result = await deleteUser(confirmarSenha)
 
-        if (typeof result === "string") {
-            setErro([errorToString(result)]);
-            return;
-        }
+                        if (typeof result === "string") {
+                            setErro([errorToString(result)]);
+                            return;
+                        }
 
-        router.navigate(Paths.LOGIN);
+                        router.navigate(Paths.LOGIN);
+                    } 
+                },
+            ],
+            { cancelable: false }
+          );
     }
 
     return (

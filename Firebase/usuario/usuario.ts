@@ -173,7 +173,7 @@ export async function editUserEmailAndPassword(
             throw new Error("User not authenticated or incorrect user ID.");
         }
 
-        reAuth(user, currentPassword);
+        await reAuth(user, currentPassword);
     
         if (user.email != newEmail && newEmail) {
             await db.updateEmail(user, newEmail);
@@ -278,17 +278,15 @@ export function errorToString(error: AuthError): string {
         case AuthError.INVALID_EMAIL:
             return "Email inválido";
         case AuthError.USER_NOT_FOUND:
-            return "Usuário não encontrado";
+        case AuthError.WRONG_PASSWORD:
+        case AuthError.INVALID_CREDENTIAL:
+            return "Login ou senha incorretos";
         case AuthError.EMAIL_EXISTS:
             return "Email já cadastrado";
         case AuthError.INVALID_PASSWORD:
             return "Senha inválida";
-        case AuthError.INVALID_CREDENTIAL:
-            return "Email ou senha incorretos";
         case AuthError.WEAK_PASSWORD:
             return "Senha fraca";
-        case AuthError.WRONG_PASSWORD:
-            return "Senha incorreta";
         default:
             return "Erro desconhecido";
     }

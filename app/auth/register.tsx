@@ -93,10 +93,10 @@ export default function Register() {
             }
         } else {
             if (cpfCnpj.length !== 14) {
-                errors.push("CNPJ inválido");
+                errors.push("CNPJ não possui caractéres o suficiente");
             }
             if (/\D/.test(cpfCnpj)) {
-                errors.push("CNPJ inválido");
+                errors.push("CNPJ deve ser apenas dígitos");
             }
         }
 

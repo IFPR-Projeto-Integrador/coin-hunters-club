@@ -55,7 +55,10 @@ export default function RootLayout() {
           ...indexHeader,
           }} />
         <Stack.Screen name="+not-found" options={{ headerShown: false }}/>
-        <Stack.Screen name="soon" options={{ headerShown: false }}/>
+        <Stack.Screen name="soon" options={{ 
+          headerTitle: "Em breve",
+          ...indexHeader
+         }}/>
       </Stack>
     </AuthProvider>
     
