@@ -68,8 +68,18 @@ export enum AuthError {
     WRONG_PASSWORD = "auth/wrong-password", UNKNOWN = "unknown"
 }
 
-export async function login(email: string, senha: string): Promise<CHCUser | AuthError> {
+export async function login(login: string, senha: string): Promise<CHCUser | AuthError> {
     try {
+        const usuariosCollection = db.collection(db.store, "usuarios");
+        const usuarioQuery = db.query(usuariosCollection, db.where("login", "==", login));
+        const usuario = await db.getDocs(usuarioQuery);
+        
+        if (usuario.docs.length === 0) {
+            return AuthError.USER_NOT_FOUND;
+        }
+
+        const email = usuario.docs[0].data().email;
+
         await db.signInWithEmailAndPassword(db.auth, email, senha);
 
         return await getLoggedUser() as CHCUser;

@@ -12,7 +12,7 @@ import { useAuth } from "@/context/authContext";
 import Loading from "@/components/ui/Loading";
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState("");
+  const [login, setLogin] = useState("");
   const [senha, setSenha] = useState("");
   const [error, setError] = useState<string | null>(null)
   const [user, loading] = useAuth();
@@ -34,14 +34,12 @@ export default function LoginScreen() {
   }
 
   async function handleLogin() {
-    const result = await loginUser(email, senha);
+    const result = await loginUser(login, senha);
 
     if (typeof result == "string") {
       setError(errorToString(result));
       return
     }
-
-    
 
     if (result.tipoUsuario == UserType.EMPRESA)
       router.navigate("/empresa");
@@ -63,7 +61,7 @@ export default function LoginScreen() {
       <CHCLogo />
       <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
         { error != null && <Text style={styles.errorMessage}>{error}</Text> }
-        <FormInput label="Email" setValue={setEmail} value={email} />
+        <FormInput label="Login" setValue={setLogin} value={login} />
         <FormInput label="Senha" setValue={setSenha} value={senha} password />
 
         <GoldButton
