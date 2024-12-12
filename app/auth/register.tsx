@@ -3,14 +3,15 @@ import { GoldButton } from "@/components/ui/GoldButton";
 import { MainView } from "@/components/layout/MainView";
 import { FormInput } from "@/components/ui/FormInput";
 import { StdStyles } from "@/constants/Styles";
-import { RegisterInformation, CHCUser, UserType, register, errorToString } from "@/firebase/usuario/usuario";
+import { RegisterInformation, CHCUser, UserType, register, errorToString, logout } from "@/firebase/usuario/usuario";
 import { useState } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, Pressable } from "react-native";
 import { router } from 'expo-router';
+import { Paths } from "@/constants/Paths";
 
 export default function Register() {
     const [tab, setTab] = useState<"cliente" | "empresa">("cliente");
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<string[]>([]);
 
     const [login, setLogin] = useState("");
     const [senha, setSenha] = useState("");
@@ -21,6 +22,13 @@ export default function Register() {
     const [cpfCnpj, setCpfCnpj] = useState("");
 
     function cadastrar() {
+        const errors = validate();
+
+        if (errors.length > 0) {
+            setError(errors);
+            return;
+        }
+
         const user: CHCUser & RegisterInformation = {
             uid: "",
             login,
@@ -35,11 +43,64 @@ export default function Register() {
         const result = register(user);
 
         if (typeof result == "string") {
-            setError(errorToString(result));
+            setError([errorToString(result)]);
             return
         }
 
         router.navigate("/");
+    }
+
+    function validate(): string[] {
+        const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).+$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        const errors: string[] = []
+
+        if (login.length == 0) {
+            errors.push("Login não pode ser vazio");
+        }
+
+        if (senha.length < 6) {
+            errors.push("Senha deve ter no mínimo 6 caracteres");
+        }
+
+        if (!passwordRegex.test(senha)) {
+            errors.push("Senha deve conter ao menos um número, uma letra minúscula, uma letra maiúscula e um caractere especial");
+        }
+
+        if (senha !== confirmsenha) {
+            errors.push("Senhas não coincidem");
+        }
+
+        if (!emailRegex.test(email)) {
+            errors.push("Email inválido");
+        }
+
+        if (email !== confirmemail) {
+            errors.push("Emails não coincidem");
+        }
+
+        if (nome.length < 3) {
+            errors.push("Nome inválido");
+        }
+
+        if (tab === "cliente") {
+            if (cpfCnpj.length !== 11) {
+                errors.push("CPF não possui caractéres o suficiente");
+            }
+            if (/\D/.test(cpfCnpj)) {
+                errors.push("CPF deve ser apenas dígitos");
+            }
+        } else {
+            if (cpfCnpj.length !== 14) {
+                errors.push("CNPJ inválido");
+            }
+            if (/\D/.test(cpfCnpj)) {
+                errors.push("CNPJ inválido");
+            }
+        }
+
+        return errors;
     }
 
     return (
@@ -47,11 +108,11 @@ export default function Register() {
             <CHCLogo />
             <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
                 <View style={styles.buttonContainer}>
-                    <GoldButton title="Cliente" onPress={() => setTab("cliente")} active={tab === "cliente"} style={[styles.tabButton, { marginRight: 10 }]}></GoldButton>
-                    <GoldButton title="Empresa" onPress={() => setTab("empresa")} active={tab === "empresa"} style={styles.tabButton}></GoldButton>
+                    <GoldButton title="Cliente" onPress={() => setTab("cliente")} active={tab === "cliente"} style={[styles.tabButton, { marginRight: 10 }]} />
+                    <GoldButton title="Empresa" onPress={() => setTab("empresa")} active={tab === "empresa"} style={styles.tabButton} />
                 </View>
 
-                { error != null && <Text style={styles.errorMessage}>{error}</Text> }
+                { error.length != 0 && error.map((value) => <Text key={value} style={styles.errorMessage}>{value}</Text>) }
 
                 <FormInput label="Login" setValue={setLogin} value={login}  />
                 <FormInput label="Senha" setValue={setSenha} value={senha} password />
@@ -62,6 +123,12 @@ export default function Register() {
                 <FormInput label={tab === "cliente" ? "CPF" : "CNPJ"} setValue={setCpfCnpj} value={cpfCnpj} />
 
                 <GoldButton title="Cadastrar-se" onPress={cadastrar} style={styles.registerButton}></GoldButton>
+                <Pressable onPress={async () => {
+                    await logout();
+                    router.navigate(Paths.LOGIN);
+                }}>
+                    <Text style={styles.returnToLogin}>Retornar a tela de login</Text>
+                </Pressable>
             </View>
         </MainView>
     )
@@ -89,5 +156,10 @@ const styles = StyleSheet.create({
     errorMessage: {
         color: "red",
         fontSize: 16,
-      },
+    },
+    returnToLogin: {
+        marginTop: 10,
+        color: "blue",
+        fontSize: 16,
+    }
 })

@@ -20,7 +20,7 @@ export default function EditPerfil() {
     const [senha, setSenha] = useState("");
     const [confirmarSenha, setConfirmarSenha] = useState("");
 
-    const [erro, setErro] = useState<string | null>(null);
+    const [erro, setErro] = useState<string[]>([]);
 
     headerConfig({ title: user?.nome ?? "Editar Perfil" });
 
@@ -28,14 +28,50 @@ export default function EditPerfil() {
         return null;
     }
 
+    function validate() {
+        const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).+$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        const errors: string[] = [];
+
+        if (email.length != 0) {
+            if (!emailRegex.test(email)) {
+                errors.push("Email inválido");
+            }
+        }
+
+        if (senha.length != 0) {
+            if (senha.length < 6 ) {
+                errors.push("Senha deve ter no mínimo 6 caracteres");
+            }
+
+            if (!passwordRegex.test(senha)) {
+                errors.push("Senha deve conter ao menos uma letra maiúscula, uma minúscula, um número e um caractere especial");
+            }
+        }
+
+        if (confirmarSenha.length == 0) {
+            errors.push("Digite sua senha atual");
+        }
+
+        return errors;
+    }
+
     async function onEdit() {
+        const errors = validate();
+
+        if (errors.length > 0) {
+            setErro(errors);
+            return;
+        }
+        
         const result = await editUserEmailAndPassword(user?.uid ?? "", confirmarSenha, email, senha);
 
         if (typeof result === "string") {
             if (result === AuthError.INVALID_CREDENTIAL)
-                setErro("Senha atual incorreta");
+                setErro(["Senha atual incorreta"]);
             else 
-                setErro(errorToString(result));
+                setErro([errorToString(result)]);
             return;
         }
 
@@ -43,15 +79,17 @@ export default function EditPerfil() {
     }
 
     async function deleteAccount() {
-        if (confirmarSenha.length == 0) {
-            setErro("Digite sua senha atual");
+        const errors = validate();
+
+        if (errors.length > 0) {
+            setErro(errors);
             return;
         }
 
         const result = await deleteUser(confirmarSenha)
 
         if (typeof result === "string") {
-            setErro(errorToString(result));
+            setErro([errorToString(result)]);
             return;
         }
 
@@ -62,8 +100,8 @@ export default function EditPerfil() {
         <Root requireAuth={true} accountButton={false}>
             <MainView>
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
-                    { erro != null && <Text style={styles.error}>{erro}</Text> }
-                    <FormInput label="Email" value={email} setValue={setEmail}/>
+                    { erro.length != 0 && erro.map((value) => <Text key={value} style={styles.error}>{value}</Text>) }
+                    <FormInput label="Email" value={email} setValue={setEmail} inputBackgroundColor={email == user?.email ? undefined : Colors.primaryLighter}/>
                     <FormInput label="Senha" value={senha} setValue={setSenha} password inputBackgroundColor={senha.length == 0 ? undefined : Colors.primaryLighter }/>
                     <FormInput label="Senha atual" value={confirmarSenha} setValue={setConfirmarSenha} password/>
                     <GoldButton title="Editar" onPress={onEdit} style={styles.button}/>

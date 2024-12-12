@@ -5,6 +5,7 @@ import { router } from "expo-router";
 import { StyleSheet, View, Text } from "react-native";
 import headerConfig from "@/helper/headerConfig";
 import { useAuth } from "@/context/authContext";
+import { Paths } from "@/constants/Paths";
 
 export default function IndexEmpresa() {
     const [user, loading] = useAuth();
@@ -18,9 +19,9 @@ export default function IndexEmpresa() {
     return (
         <MainView>
             <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
-                <GoldButton title="Recompensas" onPress={() => router.navigate("")} style={[styles.button]}/>
-                <GoldButton title="Promoções" onPress={() => router.navigate("")} style={[styles.button]}/>
-                <GoldButton title="Funcionários" onPress={() => router.navigate("")} style={[styles.button]}/>  
+                <GoldButton title="Recompensas" onPress={() => router.navigate(Paths.SOON)} style={[styles.button]}/>
+                <GoldButton title="Promoções" onPress={() => router.navigate(Paths.SOON)} style={[styles.button]}/>
+                <GoldButton title="Funcionários" onPress={() => router.navigate(Paths.SOON)} style={[styles.button]}/>  
             </View>
         </MainView>
     )

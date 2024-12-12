@@ -8,4 +8,6 @@ export enum Paths {
     EDIT_PROFILE = '/auth/editPerfil',
     FORGOT_PASSWORD = '/auth/forgotPassword',
     EMAIL_VERIFICATION = '/auth/emailVerification',
+
+    SOON = "/soon"
 }
