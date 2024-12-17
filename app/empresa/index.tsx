@@ -19,9 +19,9 @@ export default function IndexEmpresa() {
     return (
         <MainView>
             <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
-                <GoldButton title="Recompensas" onPress={() => router.navigate(Paths.SOON)} style={[styles.button]}/>
-                <GoldButton title="Promoções" onPress={() => router.navigate(Paths.SOON)} style={[styles.button]}/>
-                <GoldButton title="Funcionários" onPress={() => router.navigate(Paths.SOON)} style={[styles.button]}/>  
+                <GoldButton title="Recompensas" onPress={() => router.navigate(Paths.REWARDS)} style={[styles.button]}/>
+                <GoldButton title="Promoções" onPress={() => router.navigate(Paths.PROMOTIONS)} style={[styles.button]}/>
+                <GoldButton title="Funcionários" onPress={() => router.navigate(Paths.EMPLOYEES)} style={[styles.button]}/>  
             </View>
         </MainView>
     )

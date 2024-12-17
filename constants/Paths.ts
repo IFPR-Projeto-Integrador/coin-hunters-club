@@ -2,6 +2,10 @@
 export enum Paths {
     HOME = '/',
 
+    REWARDS = '/empresa/rewards',
+    PROMOTIONS = '/empresa/promotions',
+    EMPLOYEES = '/empresa/employees',
+
     LOGIN = '/auth/login',
     REGISTER = '/auth/register',
     PROFILE = '/auth/perfil',
