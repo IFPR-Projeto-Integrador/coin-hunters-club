@@ -4,7 +4,7 @@ import { StdStyles } from "@/constants/Styles";
 import { StyleSheet, Text, View } from "react-native";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { useState } from "react";
-import { asyncLogout, asyncSendConfirmationEmail } from "@/firebase_new/usuario/usuario";
+import { asyncLogout, asyncSendConfirmationEmail } from "@/firebase/usuario/usuario";
 import { useAuth } from "@/context/authContext";
 import Loading from "@/components/ui/Loading";
 import { router } from "expo-router";

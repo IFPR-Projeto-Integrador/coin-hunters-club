@@ -6,7 +6,7 @@ import { Colors } from "@/constants/Colors";
 import { Paths } from "@/constants/Paths";
 import { StdStyles } from "@/constants/Styles";
 import { useAuth } from "@/context/authContext";
-import { AuthError, asyncDeleteUser, asyncEditUserEmailAndPassword, errorToString, asyncLogout, UserType } from "@/firebase_new/usuario/usuario";
+import { AuthError, asyncDeleteUser, asyncEditUserEmailAndPassword, errorToString, asyncLogout, UserType } from "@/firebase/usuario/usuario";
 import headerConfig from "@/helper/headerConfig";
 import { router } from "expo-router";
 import { useState } from "react";
