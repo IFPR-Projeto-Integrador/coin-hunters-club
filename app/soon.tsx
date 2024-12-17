@@ -3,7 +3,7 @@ import Root from "@/components/Root";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { Paths } from "@/constants/Paths";
 import { useAuth } from "@/context/authContext";
-import { logout } from "@/firebase/usuario/usuario";
+import { asyncLogout } from "@/firebase/usuario/usuario";
 import { router } from "expo-router";
 import { Text, StyleSheet } from "react-native";
 
@@ -17,7 +17,7 @@ export default function SoonTM() {
 
     async function goBack() {
         if (!loading && user != null) {
-            await logout();
+            await asyncLogout();
         }
 
         router.navigate(Paths.LOGIN);

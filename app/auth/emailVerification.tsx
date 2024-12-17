@@ -4,7 +4,7 @@ import { StdStyles } from "@/constants/Styles";
 import { StyleSheet, Text, View } from "react-native";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { useState } from "react";
-import { logout, sendConfirmationEmail } from "@/firebase/usuario/usuario";
+import { asyncLogout, asyncSendConfirmationEmail } from "@/firebase/usuario/usuario";
 import { useAuth } from "@/context/authContext";
 import Loading from "@/components/ui/Loading";
 import { router } from "expo-router";
@@ -18,7 +18,7 @@ export default function EmailVerification() {
         return <Loading />;
 
     async function onSendEmail() {
-        const result = await sendConfirmationEmail();
+        const result = await asyncSendConfirmationEmail();
 
         if (result) {
             alert("Email enviado com sucesso!");
@@ -28,7 +28,7 @@ export default function EmailVerification() {
     }
 
     async function goToLogin() {
-        await logout();
+        await asyncLogout();
         router.navigate(Paths.LOGIN);
     }
 

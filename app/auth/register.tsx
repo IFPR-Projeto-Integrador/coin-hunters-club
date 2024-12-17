@@ -3,7 +3,7 @@ import { GoldButton } from "@/components/ui/GoldButton";
 import { MainView } from "@/components/layout/MainView";
 import { FormInput } from "@/components/ui/FormInput";
 import { StdStyles } from "@/constants/Styles";
-import { RegisterInformation, CHCUser, UserType, register, errorToString, logout } from "@/firebase/usuario/usuario";
+import { RegisterInformation, CHCUser, UserType, asyncRegister as asyncRegister, errorToString, asyncLogout } from "@/firebase/usuario/usuario";
 import { useState } from "react";
 import { StyleSheet, View, Text, Pressable } from "react-native";
 import { router } from 'expo-router';
@@ -21,7 +21,7 @@ export default function Register() {
     const [nome, setNome] = useState("");
     const [cpfCnpj, setCpfCnpj] = useState("");
 
-    function cadastrar() {
+    async function cadastrar() {
         const errors = validate();
 
         if (errors.length > 0) {
@@ -40,7 +40,7 @@ export default function Register() {
             senha
         };
 
-        const result = register(user);
+        const result = await asyncRegister(user);
 
         if (typeof result == "string") {
             setError([errorToString(result)]);
@@ -124,7 +124,7 @@ export default function Register() {
 
                 <GoldButton title="Cadastrar-se" onPress={cadastrar} style={styles.registerButton}></GoldButton>
                 <GoldButton title="Retornar a tela de login" onPress={async () => {
-                    await logout();
+                    await asyncLogout();
                     router.navigate(Paths.LOGIN);
                 }} />
             </View>

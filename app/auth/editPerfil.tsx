@@ -6,7 +6,7 @@ import { Colors } from "@/constants/Colors";
 import { Paths } from "@/constants/Paths";
 import { StdStyles } from "@/constants/Styles";
 import { useAuth } from "@/context/authContext";
-import { AuthError, deleteUser, editUserEmailAndPassword, errorToString, logout, UserType } from "@/firebase/usuario/usuario";
+import { AuthError, asyncDeleteUser, asyncEditUserEmailAndPassword, errorToString, asyncLogout, UserType } from "@/firebase/usuario/usuario";
 import headerConfig from "@/helper/headerConfig";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -65,7 +65,7 @@ export default function EditPerfil() {
             return;
         }
 
-        const result = await editUserEmailAndPassword(user?.uid ?? "", confirmarSenha, email, senha);
+        const result = await asyncEditUserEmailAndPassword(user?.uid ?? "", confirmarSenha, email, senha);
 
         if (typeof result === "string") {
             if (result === AuthError.INVALID_CREDENTIAL || result === AuthError.WRONG_PASSWORD)
@@ -75,7 +75,7 @@ export default function EditPerfil() {
             return;
         }
 
-        await logout();
+        await asyncLogout();
         router.navigate(Paths.PROFILE);
     }
 
@@ -97,7 +97,7 @@ export default function EditPerfil() {
                 { 
                     text: 'Sim', 
                     onPress: async () => {
-                        const result = await deleteUser(confirmarSenha)
+                        const result = await asyncDeleteUser(confirmarSenha)
 
                         if (typeof result === "string") {
                             setErro([errorToString(result)]);
