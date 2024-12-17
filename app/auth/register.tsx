@@ -3,7 +3,7 @@ import { GoldButton } from "@/components/ui/GoldButton";
 import { MainView } from "@/components/layout/MainView";
 import { FormInput } from "@/components/ui/FormInput";
 import { StdStyles } from "@/constants/Styles";
-import { RegisterInformation, CHCUser, UserType, asyncRegister as asyncRegister, errorToString, asyncLogout } from "@/firebase/usuario/usuario";
+import { RegisterInformation, CHCUser, UserType, asyncRegister as asyncRegister, errorToString, asyncLogout } from "@/firebase_new/usuario/usuario";
 import { useState } from "react";
 import { StyleSheet, View, Text, Pressable } from "react-native";
 import { router } from 'expo-router';
