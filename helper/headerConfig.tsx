@@ -1,29 +1,47 @@
 import { useNavigation } from "expo-router";
 import React, { useEffect } from "react";
+import { Colors } from "@/constants/Colors";
 
 interface HeaderConfigParams {
     title?: string;
     show?: boolean;
 }
 
-export default function headerConfig({ title, show }: HeaderConfigParams) {
+interface HeaderConfigObj {
+    headerTitleAlign: "center";
+    headerTintColor: string;
+    headerStyle: { backgroundColor: string };
+    headerTitle: string;
+    headerShown: boolean;
+}
+
+export function header({ title, show }: HeaderConfigParams): HeaderConfigObj {
+    return {
+      headerTitleAlign: "center",
+      headerTintColor: Colors.fontColor,
+      headerStyle: { backgroundColor: Colors.primary },
+      headerTitle: title ?? "",
+      headerShown: show ?? true,
+    }
+  }
+
+export default function headerConfig(headerConfig: HeaderConfigObj | HeaderConfigParams) {
     const navigation = useNavigation();
 
     useEffect(() => {
-        const options: Record<string, any> = {};
+        debugger;
 
-        if (title) {
-          options.headerTitle = title;
+        console.log("Aqui");
+
+        if ("title" in headerConfig) {
+            const headerConfigObj = header(headerConfig);
+            navigation.setOptions(headerConfigObj);
         }
-
-        if (typeof show == "boolean") {
-            options.headerShown = show;
+        else {
+            navigation.setOptions(headerConfig);
         }
-
-        if (Object.getOwnPropertyNames(options).length === 0) {
-            return;
-        }   
-    
-        navigation.setOptions(options);
-    }, [navigation, title, show]);
+    }, [navigation, headerConfig]);
 }
+
+
+

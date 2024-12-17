@@ -1,6 +1,7 @@
 import Dropdown from '@/components/ui/Dropdown';
 import { Colors } from '@/constants/Colors';
 import { AuthProvider } from '@/context/authContext';
+import { header } from '@/helper/headerConfig';
 import { useFonts } from 'expo-font';
 import { router, Stack, usePathname } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -30,43 +31,20 @@ export default function RootLayout() {
         <Stack.Screen name="auth/forgotPassword" options={{ headerShown: false }}/>
         <Stack.Screen name="auth/register" options={{ headerShown: false }}/>
         <Stack.Screen name="auth/login" options={{ headerShown: false }}/>
-        <Stack.Screen name="auth/perfil" options={{
-          headerTitle: "Perfil",
-          ...indexHeader
-          }}/>
-          <Stack.Screen name="auth/editPerfil" options={{
-          headerTitle: "Editar Perfil",
-          ...indexHeader
-          }}/>
-        <Stack.Screen name="auth/emailVerification" options={{
-          headerTitle: "Verificação",
-          ...indexHeader
-          }}/>
+        <Stack.Screen name="auth/perfil" options={header({ title: "Perfil" })}/>
+        <Stack.Screen name="auth/editPerfil" options={header({ title: "Editar Perfil" })}/>
+        <Stack.Screen name="auth/emailVerification" options={header({ title: "Verificação" })}/>
         
-        <Stack.Screen name="empresa/index" options={{ 
-          headerTitle: "Empresa",
-          ...indexHeader,
-          }} />
+        <Stack.Screen name="empresa/index" options={header({ title: "Empresa" })} />
 
-        <Stack.Screen name="cliente/index" options={{ headerShown: true }}/>
+        <Stack.Screen name="cliente/index" options={{ headerShown: false }}/>
 
-        <Stack.Screen name="index" options={{ 
-          headerTitle: "Empresa",
-          ...indexHeader,
-          }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" options={{ headerShown: false }}/>
-        <Stack.Screen name="soon" options={{ 
-          headerTitle: "Em breve",
-          ...indexHeader
-         }}/>
+        <Stack.Screen name="soon" options={header({ title: "Em breve" })}/>
       </Stack>
     </AuthProvider>
     
   );
 }
 
-const indexHeader = {
-  headerTitleAlign: "center" as "center",
-  headerTintColor: Colors.fontColor,
-  headerStyle: { backgroundColor: Colors.primary },
-}

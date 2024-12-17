@@ -5,12 +5,13 @@ import IndexEmpresa from "./empresa";
 import IndexCliente from "./cliente";
 import IndexFuncionario from "./funcionario";
 import React from "react";
+import Loading from "@/components/ui/Loading";
 
 export default function Index() {
     const [user, loading] = useAuth();
 
     if (loading) {
-      return null;
+      return <Loading />;
     }
 
     let screen: React.JSX.Element | null = null;
