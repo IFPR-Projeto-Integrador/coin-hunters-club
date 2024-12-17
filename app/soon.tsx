@@ -24,7 +24,7 @@ export default function SoonTM() {
     }
 
     return (
-        <Root>
+        <Root accountButton={false}>
             <MainView style={styles.mainContainer}>
                 <Text style={styles.soonTM}>Em breve!</Text>
                 <GoldButton title="Retornar para tela de login" onPress={goBack} style={styles.button}/>

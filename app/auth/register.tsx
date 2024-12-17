@@ -114,21 +114,19 @@ export default function Register() {
 
                 { error.length != 0 && error.map((value) => <Text key={value} style={styles.errorMessage}>{value}</Text>) }
 
-                <FormInput label="Login" setValue={setLogin} value={login}  />
-                <FormInput label="Senha" setValue={setSenha} value={senha} password />
-                <FormInput label="Confirmar Senha" setValue={setConfirmsenha} value={confirmsenha} password />
-                <FormInput label="Email" setValue={setEmail} value={email} />
-                <FormInput label="Confirmar Email" setValue={setConfirmemail} value={confirmemail} />
-                <FormInput label="Nome" setValue={setNome} value={nome} />
-                <FormInput label={tab === "cliente" ? "CPF" : "CNPJ"} setValue={setCpfCnpj} value={cpfCnpj} />
+                <FormInput label="Login" placeholder="Digite seu login" setValue={setLogin} value={login}  />
+                <FormInput label="Senha" placeholder="Digite sua senha" setValue={setSenha} value={senha} password />
+                <FormInput label="Confirmar Senha" placeholder="Confirme sua senha" setValue={setConfirmsenha} value={confirmsenha} password />
+                <FormInput label="Email" placeholder="Digite seu email" setValue={setEmail} value={email} />
+                <FormInput label="Confirmar Email" placeholder="Confirme seu email" setValue={setConfirmemail} value={confirmemail} />
+                <FormInput label="Nome" placeholder={tab == "empresa" ? "Digite o nome da empresa" : "Digite o seu nome"} setValue={setNome} value={nome} />
+                <FormInput label={tab === "cliente" ? "CPF" : "CNPJ"} setValue={setCpfCnpj} value={cpfCnpj} placeholder={tab == "empresa" ? "Digite seu CNPJ" : "Digite seu CPF"}/>
 
                 <GoldButton title="Cadastrar-se" onPress={cadastrar} style={styles.registerButton}></GoldButton>
-                <Pressable onPress={async () => {
+                <GoldButton title="Retornar a tela de login" onPress={async () => {
                     await logout();
                     router.navigate(Paths.LOGIN);
-                }}>
-                    <Text style={styles.returnToLogin}>Retornar a tela de login</Text>
-                </Pressable>
+                }} />
             </View>
         </MainView>
     )
@@ -151,7 +149,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     registerButton: {
-        marginTop: 20,
+        marginVertical: 20,
     },
     errorMessage: {
         color: "red",

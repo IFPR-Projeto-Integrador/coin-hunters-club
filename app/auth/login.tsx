@@ -35,11 +35,10 @@ export default function LoginScreen() {
     }
 
     router.navigate(Paths.HOME);
-
   }
 
   function goToForgotPassword() {
-    router.navigate(Paths.FORGOT_PASSWORD);
+    router.navigate(Paths.SOON);
   }
 
   function goToRegister() {
@@ -51,8 +50,8 @@ export default function LoginScreen() {
       <CHCLogo />
       <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
         { error != null && <Text style={styles.errorMessage}>{error}</Text> }
-        <FormInput label="Login" setValue={setLogin} value={login} />
-        <FormInput label="Senha" setValue={setSenha} value={senha} password />
+        <FormInput label="Login" placeholder="Digite seu login" setValue={setLogin} value={login} />
+        <FormInput label="Senha" placeholder="Digite sua senha" setValue={setSenha} value={senha} password />
 
         <GoldButton
           title="Logar"
