@@ -30,7 +30,7 @@ export enum AuthError {
     WRONG_PASSWORD = "auth/wrong-password", UNKNOWN = "unknown"
 }
 
-export async function getLoggedUser(): Promise<CHCUser | null> {
+export async function asyncGetLoggedUser(): Promise<CHCUser | null> {
     if (db.auth.currentUser === null) {
         return null;
     }
@@ -45,7 +45,7 @@ export async function getLoggedUser(): Promise<CHCUser | null> {
     })[0];
 }
 
-export async function getUser(id: string): Promise<CHCUser | null> {
+export async function asyncGetUser(id: string): Promise<CHCUser | null> {
     const usuariosCollection = db.collection(db.store, "usuarios");
 
     const usuarioQuery = db.query(usuariosCollection, db.where(db.documentId(), "==", id));
@@ -57,7 +57,7 @@ export async function getUser(id: string): Promise<CHCUser | null> {
     })[0];
 }
 
-export async function getAllUsers() {
+export async function asyncGetAllUsers() {
     const usuariosCollection = db.collection(db.store, "usuarios");
     // Select only name and email fields
     const usuarios = await db.getDocs(usuariosCollection);
@@ -68,7 +68,7 @@ export async function getAllUsers() {
     });
 }
 
-export async function login(login: string, senha: string): Promise<CHCUser | AuthError> {
+export async function asyncLogin(login: string, senha: string): Promise<CHCUser | AuthError> {
     try {
         const usuariosCollection = db.collection(db.store, "usuarios");
         const usuarioQuery = db.query(usuariosCollection, db.where("login", "==", login));
@@ -82,7 +82,7 @@ export async function login(login: string, senha: string): Promise<CHCUser | Aut
 
         await db.signInWithEmailAndPassword(db.auth, email, senha);
 
-        return await getLoggedUser() as CHCUser;
+        return await asyncGetLoggedUser() as CHCUser;
     } catch (error) {
         if (error instanceof FirebaseError) {
             return codeToError(error.code);
@@ -92,7 +92,7 @@ export async function login(login: string, senha: string): Promise<CHCUser | Aut
     throw new Error("'login' function should not reach this point");
 }
 
-export async function logout() {
+export async function asyncLogout() {
     try {
         await db.signOut(db.auth);
     } catch (error) {
@@ -102,7 +102,7 @@ export async function logout() {
     }
 }
 
-export async function register({login, nome, email, senha, dtNascimento, cpfCnpj, tipoUsuario}: CHCUser & RegisterInformation):
+export async function asyncRegister({login, nome, email, senha, dtNascimento, cpfCnpj, tipoUsuario}: CHCUser & RegisterInformation):
     Promise<CHCUser | AuthError> {
     try {
         const userCredential = await db.createUserWithEmailAndPassword(db.auth, email, senha);
@@ -134,7 +134,7 @@ export async function register({login, nome, email, senha, dtNascimento, cpfCnpj
     throw new Error("'register' function should not reach this point");
 }
 
-export async function deleteUser(password: string): Promise<AuthError | undefined> {
+export async function asyncDeleteUser(password: string): Promise<AuthError | undefined> {
     try {
         debugger;
         const user = db.auth.currentUser;
@@ -145,7 +145,7 @@ export async function deleteUser(password: string): Promise<AuthError | undefine
     
         const userDocRef = db.doc(db.store, "usuarios", user.uid);
 
-        await reAuth(user, password);
+        await asyncReAuth(user, password);
 
         await db.deleteDoc(userDocRef);
         await db.deleteUser(user);
@@ -160,7 +160,7 @@ export async function deleteUser(password: string): Promise<AuthError | undefine
     throw new Error("Could not delete user");
 }
 
-export async function editUserEmailAndPassword(
+export async function asyncEditUserEmailAndPassword(
     userId: string,
     currentPassword: string,
     newEmail?: string,
@@ -173,7 +173,7 @@ export async function editUserEmailAndPassword(
             throw new Error("User not authenticated or incorrect user ID.");
         }
 
-        await reAuth(user, currentPassword);
+        await asyncReAuth(user, currentPassword);
     
         if (user.email != newEmail && newEmail) {
             await db.updateEmail(user, newEmail);
@@ -188,7 +188,7 @@ export async function editUserEmailAndPassword(
             await db.updateDoc(userDocRef, { email: newEmail });
         }
     
-        return await getUser(userId) as CHCUser;
+        return await asyncGetUser(userId) as CHCUser;
     } catch (error) {
         if (error instanceof FirebaseError) {
             return codeToError(error.code);
@@ -200,7 +200,7 @@ export async function editUserEmailAndPassword(
     throw new Error(`Failed to edit user email/password for user ID: ${userId}`);
 }
 
-export async function changeUserEmailRaw(newEmail: string): Promise<boolean> {
+export async function asyncChangeUserEmailRaw(newEmail: string): Promise<boolean> {
     try {
         const user = db.auth.currentUser;
     
@@ -225,7 +225,7 @@ export async function changeUserEmailRaw(newEmail: string): Promise<boolean> {
     throw new Error("Could not send confirmation email");
 }
 
-export async function sendConfirmationEmail(): Promise<boolean> {
+export async function asyncSendConfirmationEmail(): Promise<boolean> {
     try {
         const user = db.auth.currentUser;
     
@@ -268,7 +268,7 @@ function codeToError(errorCode: string): AuthError {
     }
 }
 
-async function reAuth(user: User, password: string) {
+async function asyncReAuth(user: User, password: string) {
     const credential = db.EmailAuthProvider.credential(user.email!, password);
     await db.reauthenticateWithCredential(user, credential);
 }

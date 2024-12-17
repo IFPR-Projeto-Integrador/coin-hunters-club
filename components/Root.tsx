@@ -1,5 +1,5 @@
 import { useAuth } from "@/context/authContext";
-import { UserType, logout } from "@/firebase/usuario/usuario"
+import { UserType, asyncLogout } from "@/firebase/usuario/usuario"
 import { Redirect, router, usePathname } from "expo-router";
 import { PropsWithChildren } from "react";
 import { StyleSheet } from "react-native";
@@ -42,7 +42,7 @@ export default function Root({ children, requireAuth = false, accountButton = tr
                 router.navigate(Paths.PROFILE);
                 return
             case "logout":
-                await logout();
+                await asyncLogout();
                 router.navigate(Paths.LOGIN);
                 return;
         }
