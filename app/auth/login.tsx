@@ -7,7 +7,7 @@ import { useState } from "react";
 import { StyleSheet, View, Text } from "react-native";
 import { Redirect, router } from 'expo-router';
 import { Colors } from "@/constants/Colors";
-import { CHCUser, AuthError, asyncLogin as loginUser, errorToString, UserType } from "@/firebase/usuario/usuario";
+import { CHCUser, AuthError, asyncLogin as loginUser, errorToString, UserType } from "@/Firebase/usuario/usuario";
 import { useAuth } from "@/context/authContext";
 import Loading from "@/components/ui/Loading";
 import { Paths } from "@/constants/Paths";

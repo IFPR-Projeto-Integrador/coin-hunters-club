@@ -1,4 +1,4 @@
-import db from "@/firebase/config"
+import db from "@/Firebase/config"
 import { router } from "expo-router";
 import { FirebaseError } from "firebase/app";
 import { User } from "firebase/auth";
