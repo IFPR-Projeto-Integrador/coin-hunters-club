@@ -1,5 +1,5 @@
 import { useAuth } from "@/context/authContext";
-import { UserType, asyncLogout } from "@/Firebase/usuario/usuario"
+import { UserType, asyncLogout } from "@/firebase/usuario/usuario"
 import { Redirect, router, usePathname } from "expo-router";
 import { PropsWithChildren } from "react";
 import { StyleSheet } from "react-native";

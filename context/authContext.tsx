@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, PropsWithChildren } from "react";
-import db from "@/Firebase/config"
-import { asyncChangeUserEmailRaw, asyncGetUser } from "@/Firebase/usuario/usuario";
-import { CHCUser } from "@/Firebase/usuario/usuario";
+import db from "@/firebase/config"
+import { asyncChangeUserEmailRaw, asyncGetUser } from "@/firebase/usuario/usuario";
+import { CHCUser } from "@/firebase/usuario/usuario";
 
 interface Props extends PropsWithChildren {}
 
