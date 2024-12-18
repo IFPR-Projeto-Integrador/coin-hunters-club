@@ -35,6 +35,15 @@ export default function RootLayout() {
         <Stack.Screen name="auth/editPerfil" options={header({ title: "Editar Perfil" })}/>
         <Stack.Screen name="auth/emailVerification" options={header({ title: "Verificação" })}/>
         
+        <Stack.Screen name="company/reward/index" options={{ headerShown: false }}/>
+        <Stack.Screen name="company/reward/createReward" options={{ headerShown: false }}/>
+
+        <Stack.Screen name="company/promotion/index" options={{ headerShown: false }}/>
+        <Stack.Screen name="company/promotion/createPromotion" options={{ headerShown: false }}/>
+
+        <Stack.Screen name="company/employee/index" options={{ headerShown: false }}/>
+        <Stack.Screen name="company/employee/createEmployee" options={{ headerShown: false }}/>
+
         <Stack.Screen name="empresa/index" options={header({ title: "Empresa" })} />
 
         <Stack.Screen name="cliente/index" options={{ headerShown: false }}/>

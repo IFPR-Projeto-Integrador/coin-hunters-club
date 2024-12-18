@@ -14,7 +14,7 @@ export default function IndexRewards() {
         <Root requireAuth>
             <MainView>
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
-                    <GoldButton title="Cadastrar Recompensa" onPress={() => router.navigate(Paths.REWARDS)} style={[styles.button]}/>
+                    <GoldButton title="Cadastrar Recompensa" onPress={() => router.navigate(Paths.CREATE_REWARD)} style={[styles.button]}/>
                 </View>
             </MainView>
         </Root>

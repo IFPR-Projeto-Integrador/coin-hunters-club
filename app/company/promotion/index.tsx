@@ -14,7 +14,7 @@ export default function IndexPromotions() {
         <Root requireAuth>
             <MainView>
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
-                    <GoldButton title="Cadastrar Promoção" onPress={() => router.navigate(Paths.PROMOTIONS)} style={[styles.button]}/>
+                    <GoldButton title="Cadastrar Promoção" onPress={() => router.navigate(Paths.CREATE_PROMOTION)} style={[styles.button]}/>
                 </View>
             </MainView>
         </Root>
