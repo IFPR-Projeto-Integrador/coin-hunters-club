@@ -4,7 +4,7 @@ import { GoldButton } from "@/components/ui/GoldButton";
 import { Paths } from "@/constants/Paths";
 import { StdStyles } from "@/constants/Styles";
 import { useAuth } from "@/context/authContext";
-import { UserType } from "@/firebase/usuario/usuario";
+import { UserType } from "@/firebase/user/user";
 import headerConfig from "@/helper/headerConfig";
 import { router } from "expo-router";
 import { Text, View, StyleSheet } from "react-native";

@@ -3,7 +3,7 @@ import Root from "@/components/Root";
 import { GoldButton } from "@/components/ui/GoldButton";
 import { Paths } from "@/constants/Paths";
 import { useAuth } from "@/context/authContext";
-import { asyncLogout } from "@/firebase/usuario/usuario";
+import { asyncLogout } from "@/firebase/user/user";
 import { router } from "expo-router";
 import { Text, StyleSheet } from "react-native";
 

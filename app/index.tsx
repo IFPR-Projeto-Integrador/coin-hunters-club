@@ -1,6 +1,6 @@
 import Root from "@/components/Root";
 import { useAuth } from "@/context/authContext";
-import { UserType } from "@/firebase/usuario/usuario";
+import { UserType } from "@/firebase/user/user";
 import IndexEmpresa from "./company";
 import IndexCliente from "./client";
 import IndexFuncionario from "./employee";
