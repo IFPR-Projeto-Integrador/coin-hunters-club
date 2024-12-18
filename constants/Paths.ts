@@ -2,9 +2,14 @@
 export enum Paths {
     HOME = '/',
 
-    REWARDS = '/empresa/rewards',
-    PROMOTIONS = '/empresa/promotions',
-    EMPLOYEES = '/empresa/employees',
+    REWARDS = '/empresa/reward/index',
+    CREATE_REWARD = '/empresa/reward/createReward',
+
+    PROMOTIONS = '/empresa/promotion/index',
+    CREATE_PROMOTION = '/empresa/promotion/createPromotion',
+
+    EMPLOYEES = '/empresa/employee/index',
+    CREATE_EMPLOYEE = '/empresa/employee/createEmployee',
 
     LOGIN = '/auth/login',
     REGISTER = '/auth/register',
