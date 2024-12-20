@@ -1,3 +1,5 @@
 - Fazer o login do usuário ser único
 - Adicionar data de nascimento ao usuário
 - Adicionar data de criação da conta
+- Elevar "Root" para toda a aplicação ao invés de estar em toda tela
+- Mudar o local das validações do usuário para seu próprio arquivo na pasta "user"
