@@ -35,14 +35,16 @@ export default function RootLayout() {
         <Stack.Screen name="auth/editPerfil" options={header({ title: "Editar Perfil" })}/>
         <Stack.Screen name="auth/emailVerification" options={header({ title: "Verificação" })}/>
         
-        <Stack.Screen name="company/reward/index" options={{ headerShown: false }}/>
-        <Stack.Screen name="company/reward/createReward" options={{ headerShown: false }}/>
+        <Stack.Screen name="company/reward/index" options={header({ title: "Recompensas" })}/>
+        <Stack.Screen name="company/reward/createReward" options={header({ title: "Nova Recompensa" })}/>
+        <Stack.Screen name="company/reward/editReward" options={header({ title: "Nome da Recompensa sendo editada" })}/>
 
-        <Stack.Screen name="company/promotion/index" options={{ headerShown: false }}/>
-        <Stack.Screen name="company/promotion/createPromotion" options={{ headerShown: false }}/>
+        <Stack.Screen name="company/promotion/index" options={header({ title: "Promoções" })}/>
+        <Stack.Screen name="company/promotion/createPromotion" options={header({ title: "Nova Promoção" })}/>
+        <Stack.Screen name="company/reward/editPromotion" options={header({ title: "Nome da Promoção sendo editada" })}/>
 
-        <Stack.Screen name="company/employee/index" options={{ headerShown: false }}/>
-        <Stack.Screen name="company/employee/createEmployee" options={{ headerShown: false }}/>
+        <Stack.Screen name="company/employee/index" options={header({ title: "Funcionários" })}/>
+        <Stack.Screen name="company/employee/createEmployee" options={header({ title: "Novo Funcionário" })}/>
 
         <Stack.Screen name="empresa/index" options={header({ title: "Empresa" })} />
 

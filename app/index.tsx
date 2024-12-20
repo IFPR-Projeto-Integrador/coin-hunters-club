@@ -1,9 +1,9 @@
 import Root from "@/components/Root";
 import { useAuth } from "@/context/authContext";
 import { UserType } from "@/firebase/user/user";
-import IndexEmpresa from "./company";
-import IndexCliente from "./client";
-import IndexFuncionario from "./employee";
+import IndexCompany from "./company";
+import IndexClient from "./client";
+import IndexEmployee from "./employee";
 import React from "react";
 import Loading from "@/components/ui/Loading";
 
@@ -17,17 +17,17 @@ export default function Index() {
     let screen: React.JSX.Element | null = null;
 
     if (user?.tipoUsuario === UserType.EMPRESA) {
-        screen = <IndexEmpresa />
+        screen = <IndexCompany />
     }
     if (user?.tipoUsuario === UserType.CLIENTE) {
-        screen = <IndexCliente />
+        screen = <IndexClient />
     }
     if (user?.tipoUsuario === UserType.FUNCIONARIO) {
-        screen = <IndexFuncionario />
+        screen = <IndexEmployee />
     }
 
     return (
-        <Root requireAuth={true}>
+        <Root accountButton = {true} requireAuth = {true}>
             { screen }
         </Root>
     )

@@ -21,7 +21,7 @@ interface Props extends PropsWithChildren {
     editButton?: EditButtonConfig | null;
 }
 
-export default function Root({ children, requireAuth = false, accountButton = true, editButton = null }: Props) {
+export default function Root({ children, requireAuth = false, accountButton = false, editButton = null }: Props) {
     const [user, loading] = useAuth();
 
     if (loading) {

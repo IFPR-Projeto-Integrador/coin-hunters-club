@@ -7,7 +7,7 @@ import headerConfig from "@/helper/headerConfig";
 import { useAuth } from "@/context/authContext";
 import { Paths } from "@/constants/Paths";
 
-export default function IndexEmpresa() {
+export default function IndexCompany() {
     const [user, loading] = useAuth();
 
     headerConfig({ title: user?.nome ?? "Empresa" });
@@ -19,9 +19,9 @@ export default function IndexEmpresa() {
     return (
         <MainView>
             <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
-                <GoldButton title="Recompensas" onPress={() => router.navigate(Paths.REWARDS)} style={[styles.button]}/>
-                <GoldButton title="Promoções" onPress={() => router.navigate(Paths.PROMOTIONS)} style={[styles.button]}/>
-                <GoldButton title="Funcionários" onPress={() => router.navigate(Paths.EMPLOYEES)} style={[styles.button]}/>  
+                <GoldButton title="Recompensas" onPress={() => router.navigate(Paths.REWARD)} style={[styles.button]}/>
+                <GoldButton title="Promoções" onPress={() => router.navigate(Paths.PROMOTION)} style={[styles.button]}/>
+                <GoldButton title="Funcionários" onPress={() => router.navigate(Paths.EMPLOYEE)} style={[styles.button]}/>  
             </View>
         </MainView>
     )

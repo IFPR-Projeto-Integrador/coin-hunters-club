@@ -8,14 +8,14 @@ import { useAuth } from "@/context/authContext";
 import { Paths } from "@/constants/Paths";
 import Root from "@/components/Root";
 
-export default function IndexEmpresa() {
+export default function EditReward() {
     const [user, loading] = useAuth();
 
     return (
         <Root requireAuth>
             <MainView>
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
-                    <GoldButton title="Cadastrar Recompensa" onPress={() => router.navigate(Paths.REWARDS)} style={[styles.button]}/>
+                    <GoldButton title="SOON" onPress={() => router.navigate(Paths.SOON)} style={[styles.button]}/>
                 </View>
             </MainView>
         </Root>

@@ -7,7 +7,7 @@ import { useAuth } from "@/context/authContext";
 import { Paths } from "@/constants/Paths";
 import Root from "@/components/Root";
 
-export default function IndexPromotions() {
+export default function IndexPromotion() {
     const [user, loading] = useAuth();
 
     return (
