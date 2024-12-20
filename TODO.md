@@ -1,1 +1,3 @@
 - Fazer o login do usuário ser único
+- Adicionar data de nascimento ao usuário
+- Adicionar data de criação da conta
