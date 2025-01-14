@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, setDoc, updateDoc, documentId, where, query, doc, getDoc } from "firebase/firestore";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, setDoc, updateDoc, documentId, where, query, doc, getDoc, Timestamp } from "firebase/firestore";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, updateEmail, updatePassword, sendEmailVerification,
     reauthenticateWithCredential, EmailAuthProvider, deleteUser
  } from "firebase/auth";
@@ -47,6 +47,7 @@ const db = {
     EmailAuthProvider,
     sendEmailVerification,
     deleteUser,
+    Timestamp,
 }
 
 export default db;
