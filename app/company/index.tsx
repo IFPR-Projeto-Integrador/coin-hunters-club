@@ -27,11 +27,11 @@ export default function IndexCompany() {
 
         const promotion: Promotion = {
             uid: undefined,
-            nome: "Recompensa",
-            dtInicio: Timestamp.fromDate(nowPlusFive),
-            dtFim: Timestamp.fromDate(nowPlusTen),
-            conversao: 10,
-            recompensas: []
+            name: "Recompensa",
+            dtStart: Timestamp.fromDate(nowPlusFive),
+            dtEnd: Timestamp.fromDate(nowPlusTen),
+            conversion: 10,
+            rewards: []
         } 
         const result = await promotions.asyncCreatePromotion(promotion, user!);
 

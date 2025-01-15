@@ -2,11 +2,11 @@ import { Timestamp } from "firebase/firestore";
 
 export interface Promotion {
     uid?: string;
-    nome: string;
-    dtInicio: Timestamp;
-    dtFim: Timestamp;
-    conversao: number;
-    recompensas: PromotionReward[];
+    name: string;
+    dtStart: Timestamp;
+    dtEnd: Timestamp;
+    conversion: number;
+    rewards: PromotionReward[];
 }
 
 export interface PromotionReward {

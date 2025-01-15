@@ -5,9 +5,9 @@ import { Timestamp } from "firebase/firestore";
 export function validatePromotion(reward: Promotion): PromotionError[] {
     const errors: PromotionError[] = [];
 
-    errors.push(...validPromotionName(reward.nome));
-    errors.push(...validPromotionDate(reward.dtInicio, reward.dtFim));
-    errors.push(...validConversion(reward.conversao));
+    errors.push(...validPromotionName(reward.name));
+    errors.push(...validPromotionDate(reward.dtStart, reward.dtEnd));
+    errors.push(...validConversion(reward.conversion));
 
     return errors;
 }

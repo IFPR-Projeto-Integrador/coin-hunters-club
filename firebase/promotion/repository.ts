@@ -43,7 +43,7 @@ export async function asyncEditPromotionName(promotion: Promotion, client: CHCUs
     if (docPromotion == undefined)
         return PromotionError.PromotionDoesNotExist;
 
-    docPromotion.nome = newName;
+    docPromotion.name = newName;
 
     await db.setDoc(docRef, docPromotion);
 
