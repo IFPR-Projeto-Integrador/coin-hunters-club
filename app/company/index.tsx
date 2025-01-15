@@ -6,9 +6,10 @@ import { StyleSheet, View, Text } from "react-native";
 import headerConfig from "@/helper/headerConfig";
 import { useAuth } from "@/context/authContext";
 import { Paths } from "@/constants/Paths";
-import * as rewards from "@/firebase/reward/repository";
 import React from "react";
-import { Reward } from "@/firebase/reward/types";
+import { Promotion } from "@/firebase/promotion/types";
+import * as promotions from "@/firebase/promotion/repository";
+import { Timestamp } from "firebase/firestore";
 
 export default function IndexCompany() {
     const [user, loading] = useAuth();
@@ -20,42 +21,47 @@ export default function IndexCompany() {
     }
 
     async function createNew() {
-        const reward: Reward = {
-            nome: "Recompensa",
-            imagem: "Imagem",
-            descricao: "Descrição",
-            uid: undefined
+        const now = new Date();
+        const nowPlusFive = new Date(now.getTime() + 5 * 60000);
+        const nowPlusTen = new Date(now.getTime() + 10 * 60000);
+
+        const promotion: Promotion = {
+            uid: undefined,
+            name: "Recompensa",
+            dtStart: Timestamp.fromDate(nowPlusFive),
+            dtEnd: Timestamp.fromDate(nowPlusTen),
+            conversion: 10,
+            rewards: []
         } 
-        const result = await rewards.asyncCreateReward(reward, user!);
+        const result = await promotions.asyncCreatePromotion(promotion, user!);
 
         if (result == null)
-            console.log("Erro ao criar recompensa");
+            console.log("Erro ao criar promoção");
         else
-            console.log("Recompensa criada com sucesso: ", result);
+            console.log("Promoção criada com sucesso: ", result);
     }
 
     async function editLast() {
-        const allRewards = await rewards.asyncGetRewards(user!);
-        const reward = allRewards[allRewards.length - 1];
-        reward.nome = "Recompensa editada";
-        const result = await rewards.asyncEditReward(reward, user!);
+        const allPromotions = await promotions.asyncGetPromotions(user!);
+        const promotion = allPromotions[allPromotions.length - 1];
+        const result = await promotions.asyncEditPromotionName(promotion, user!, "Promoção Editada");
 
         if (result == null)
-            console.log("Erro ao editar recompensa");
+            console.log("Erro ao editar promoção");
         else
-            console.log("Recompensa editada com sucesso: ", result)
+            console.log("Promoção editada com sucesso: ", result)
     }
 
     async function deleteLast() {
-        const allRewards = await rewards.asyncGetRewards(user!);
-        const reward: Reward = allRewards[allRewards.length - 1];
-        if (reward == null) {
-            console.log("Nenhuma recompensa para deletar");
+        const allPromotions = await promotions.asyncGetPromotions(user!);
+        const promotion: Promotion = allPromotions[allPromotions.length - 1];
+        if (promotion == null) {
+            console.log("Nenhuma promoção para deletar");
             return;
         }
-        await rewards.asyncDeleteReward(reward, user!);
+        await promotions.asyncDeletePromotion(promotion, user!);
 
-        console.log("Deletado recompensa com sucesso!");
+        console.log("Deletado promoção com sucesso!");
     }
 
     return (
@@ -67,7 +73,7 @@ export default function IndexCompany() {
 
                 { user != null ?
                     <>
-                        <GoldButton title="Read all" onPress={async () => console.log(await rewards.asyncGetRewards(user))} style={[styles.button]}></GoldButton>
+                        <GoldButton title="Read all" onPress={async () => console.log(await promotions.asyncGetPromotions(user))} style={[styles.button]}></GoldButton>
                         <GoldButton title="Create new" onPress={createNew} style={[styles.button]}></GoldButton>
                         <GoldButton title="Edit last" onPress={editLast} style={[styles.button]}></GoldButton>
                         <GoldButton title="Delete last" onPress={deleteLast} style={[styles.button]}></GoldButton>

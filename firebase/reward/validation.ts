@@ -3,8 +3,9 @@ import { Reward, RewardError } from "./types";
 export function validateReward(reward: Reward): RewardError[] {
     const errors: RewardError[] = [];
 
-    errors.push(...validRewardName(reward.nome));
-    errors.push(...validRewardDescription(reward.descricao));
+    errors.push(...validRewardName(reward.name));
+    errors.push(...validRewardDescription(reward.description));
+    errors.push(...validRewardImage(reward.imageBase64));
 
     return errors;
 }
@@ -34,6 +35,16 @@ export function validRewardDescription(rewardDescription: string): RewardError[]
     }
     if (rewardDescription.length > 500) {
         errors.push(RewardError.DescriptionTooLong);
+    }
+
+    return errors;
+}
+
+export function validRewardImage(rewardImage: string): RewardError[] {
+    const errors: RewardError[] = [];
+
+    if (rewardImage.length == 0 || rewardImage == null || !rewardImage.startsWith("data:image")) {
+        errors.push(RewardError.ImageRequired);
     }
 
     return errors;
