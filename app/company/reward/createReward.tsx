@@ -12,6 +12,7 @@ import { Reward, rewardErrorToUser } from "@/firebase/reward/types";
 import { uriToBase64 } from "@/helper/images";
 import * as Rewards from "@/firebase/reward/repository";
 import { useAuth } from "@/context/authContext";
+import { StdStyles } from "@/constants/Styles";
 
 export default function CreateReward() {
   const [user, loading] = useAuth();
@@ -91,21 +92,24 @@ export default function CreateReward() {
   return (
     <Root requireAuth>
       <MainView>
-        <View style={styles.container}>
-          <GoldButton title="Selecionar Imagem" onPress={openGalleryWithCrop} />
-          {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
-        </View>
-        <View style={styles.mainContainer}>
-          <FormInput label="Nome" setValue={setName} value={name} />
-          <FormInput label="Descrição" setValue={setDescription} value={description} />
-          <GoldButton
-            title="Salvar"
-            onPress={save}
-            style={styles.button}
-          />
+        <View style={[StdStyles.secondaryContainer,styles.mainContainer]}>
+          <View style={styles.container}>
+            <GoldButton title="Selecionar Imagem" onPress={openGalleryWithCrop} />
+            {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
+          </View>
+          <View>
+            <FormInput label="Nome" setValue={setName} value={name} />
+            <FormInput label="Descrição" setValue={setDescription} value={description} />
+            <GoldButton
+              title="Salvar"
+              onPress={save}
+              style={styles.button}
+            />
 
-          {error && error.map((e) => <Text key={e} style={styles.error}>{e}</Text>)}
+            {error && error.map((e) => <Text key={e} style={styles.error}>{e}</Text>)}
+          </View>
         </View>
+        
       </MainView>
     </Root>
   );
