@@ -1,32 +1,63 @@
 import { GoldButton } from "@/components/ui/GoldButton";
 import { MainView } from "@/components/layout/MainView";
-import { StdStyles } from "@/constants/Styles";
-import { router } from "expo-router";
 import { StyleSheet, View, Text } from "react-native";
-import headerConfig from "@/helper/headerConfig";
-import { useAuth } from "@/context/authContext";
+import { router } from "expo-router";
 import { Paths } from "@/constants/Paths";
 import Root from "@/components/Root";
+import { FormInput } from "@/components/ui/FormInput";
+import { useState } from "react";
+import { StdStyles } from "@/constants/Styles";
 
 export default function CreatePromotion() {
-    const [user, loading] = useAuth();
+  const [name, setName] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [conversion, setConversion] = useState("");
 
-    return (
-        <Root requireAuth>
-            <MainView>
-                <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
-                    <GoldButton title="SOON" onPress={() => router.navigate(Paths.SOON)} style={[styles.button]}/>
-                </View>
-            </MainView>
-        </Root>
-    )
+  return (
+    <Root requireAuth>
+      <MainView>
+        <View style={[StdStyles.secondaryContainer,styles.mainContainer]}>
+          <FormInput label="Nome da promoção" setValue={setName} value={name} />
+          <FormInput label="Data de início" setValue={setStartDate} value={startDate} />
+          <FormInput label="Data de término" setValue={setEndDate} value={endDate} />
+          <FormInput label="Conversão" setValue={setConversion} value={conversion} />
+          <Text style={styles.text}>Valor em reais que será convertido em 1.000 Coins</Text>
+          <GoldButton
+            title="Vincular Recompensas"
+            onPress={() => router.navigate(Paths.SOON)}
+            style={styles.button}
+          />
+        </View>
+        <GoldButton
+            title="Salvar"
+            onPress={() => router.navigate(Paths.SOON)}
+            style={styles.button}
+          />
+      </MainView>
+    </Root>
+  );
 }
 
 const styles = StyleSheet.create({
+    container: {
+        marginTop: 20,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      image: {
+        width: 200,
+        height: 200,
+        marginTop: 20,
+      },
     mainContainer: {
         padding: 15
     },
     button: {
         marginVertical: 10
+    },
+    text:{
+        marginBottom: 10,
     }
 })
