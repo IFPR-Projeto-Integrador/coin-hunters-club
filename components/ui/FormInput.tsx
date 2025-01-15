@@ -1,24 +1,64 @@
 import { Colors } from '@/constants/Colors';
 import React, { useState } from 'react';
-import { TextInput, StyleSheet, View, Text, TextInputBase, ViewProps } from 'react-native';
+import { TextInput, StyleSheet, View, Text, Keyboard } from 'react-native';
+import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+import { dateToString, isDateStringDDMMYYYY, stringToDate } from '@/helper/dates';
 
 interface Props {
     label: string;
     setValue: (value: string) => void;
     value: string;
     password?: boolean;
+    date?: boolean;
+    number?: boolean;
     placeholder?: string;
     inputBackgroundColor?: string;
 };
 
-export function FormInput({ placeholder, label, value, setValue, inputBackgroundColor, password = false }: Props) {
+export function FormInput({ placeholder, label, value, setValue, inputBackgroundColor, password = false, date = false, number = false }: Props) {
+  let changeTextFunc = undefined;
+
+  if (number) {
+    changeTextFunc = (text: string) => {
+      if (/^\d+$/.test(text) || text === "") {
+        setValue(text);
+      }
+    };
+  } else if (date) {
+    changeTextFunc = undefined;
+  } 
+  else {
+    changeTextFunc = setValue;
+  }
+  
+
+  function openedDatePicker() {
+    Keyboard.dismiss();
+
+    const currentlySelectedDate = isDateStringDDMMYYYY(value) ? stringToDate(value) : new Date();
+
+    DateTimePickerAndroid.open({ 
+      mode: 'date', 
+      value: currentlySelectedDate,
+      onChange: async (event, selectedDate) => {
+        if (event.type === 'set' && selectedDate) {
+          setValue(dateToString(selectedDate));
+        }
+
+        await DateTimePickerAndroid.dismiss('date');
+      } 
+    });
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label ?? ""}</Text>
       <TextInput
+        keyboardType={number ? "number-pad" : "default"}
         secureTextEntry={password}
-        value={value ?? ""}
-        onChangeText={setValue}
+        value={value}
+        onChangeText={changeTextFunc}
+        onFocus={date ? openedDatePicker : undefined}
         placeholder={placeholder ?? "Digite algo..."}
         style={[styles.input, inputBackgroundColor && { backgroundColor: inputBackgroundColor }]}
       />

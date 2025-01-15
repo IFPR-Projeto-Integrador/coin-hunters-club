@@ -19,9 +19,9 @@ export default function CreatePromotion() {
       <MainView>
         <View style={[StdStyles.secondaryContainer,styles.mainContainer]}>
           <FormInput label="Nome da promoção" setValue={setName} value={name} />
-          <FormInput label="Data de início" setValue={setStartDate} value={startDate} />
-          <FormInput label="Data de término" setValue={setEndDate} value={endDate} />
-          <FormInput label="Conversão" setValue={setConversion} value={conversion} />
+          <FormInput label="Data de início" setValue={setStartDate} value={startDate} date/>
+          <FormInput label="Data de término" setValue={setEndDate} value={endDate} date />
+          <FormInput label="Conversão" setValue={setConversion} value={conversion} number />
           <Text style={styles.text}>Valor em reais que será convertido em 1.000 Coins</Text>
           <GoldButton
             title="Vincular Recompensas"
