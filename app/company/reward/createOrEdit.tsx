@@ -5,7 +5,7 @@ import { router } from "expo-router";
 import { Paths } from "@/constants/Paths";
 import Root from "@/components/Root";
 import { FormInput } from "@/components/ui/FormInput";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import { Reward, rewardErrorToUser } from "@/firebase/reward/types";
@@ -13,6 +13,10 @@ import { uriToBase64 } from "@/helper/images";
 import * as Rewards from "@/firebase/reward/repository";
 import { useAuth } from "@/context/authContext";
 import { StdStyles } from "@/constants/Styles";
+import { useRoute } from "@react-navigation/native";
+import Loading from "@/components/ui/Loading";
+import React from "react";
+import headerConfig from "@/helper/headerConfig";
 
 export default function CreateReward() {
   const [user, loading] = useAuth();
@@ -25,11 +29,34 @@ export default function CreateReward() {
   const [description, setDescription] = useState("");
   const [imageUri, setImageUri] = useState<string | null>(null);
 
+  headerConfig({ title: name });
+
   const [error, setError] = useState<string[] | null>(null);
+
+  const route = useRoute<{ key: string; name: string; params: { rewardId?: string } }>();
+  const { rewardId } = route.params;
+  const [loadingReward, setLoadingReward] = useState(true);
+
+  useEffect(() => {
+    if (user && rewardId) {
+      Rewards.asyncGetRewardById(rewardId, user)
+        .then((reward) => {
+          if (reward) {
+            setName(reward.name);
+            setDescription(reward.description);
+            setImageUri(reward.imageBase64);
+          }
+          setLoadingReward(false);
+        })
+        .catch((err) => console.error(err));
+    }
+    else {
+      setLoadingReward(false);
+    }
+  }, [user]);
 
   const openGalleryWithCrop = async (): Promise<void> => {
     try {
-      // Request permissions for media library access
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
       if (!permissionResult.granted) {
@@ -37,12 +64,11 @@ export default function CreateReward() {
         return;
       }
 
-      // Open the image picker with cropping enabled
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
-        allowsEditing: true, // Enable cropping
-        aspect: [1, 1], // Crop to square aspect ratio
-        quality: 1, // Maximum image quality
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
       });
 
       if (!result.canceled) {
@@ -78,36 +104,52 @@ export default function CreateReward() {
       imageBase64: imageUri ?? "",
     }
 
-    const result = await Rewards.asyncCreateReward(reward, user);
+    if (!rewardId) {
+      const result = await Rewards.asyncCreateReward(reward, user);
 
-    if ("length" in result) {
-      const errors = result.map((e) => rewardErrorToUser(e));
-      setError(errors);
-      return;
+      if ("length" in result) {
+        const errors = result.map((e) => rewardErrorToUser(e));
+        setError(errors);
+        return;
+      }
+    }
+    else {
+      reward.uid = rewardId;
+      const result = await Rewards.asyncEditReward(reward, user);
+  
+      if (result == null) {
+        setError(["Erro ao editar recompensa"]);
+        return;
+      }
     }
     
     router.navigate(Paths.REWARD);
+    
   }
 
   return (
     <Root requireAuth>
       <MainView>
         <View style={[StdStyles.secondaryContainer,styles.mainContainer]}>
-          <View style={styles.container}>
-            <GoldButton title="Selecionar Imagem" onPress={openGalleryWithCrop} />
-            {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
-          </View>
-          <View>
-            <FormInput label="Nome" setValue={setName} value={name} />
-            <FormInput label="Descrição" setValue={setDescription} value={description} />
-            <GoldButton
-              title="Salvar"
-              onPress={save}
-              style={styles.button}
-            />
+          {loadingReward && <Loading />}
+          {!loadingReward && 
+          <>
+            <View style={styles.container}>
+              <GoldButton title="Selecionar Imagem" onPress={openGalleryWithCrop} />
+              {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
+            </View>
+            <View>
+              <FormInput label="Nome" setValue={setName} value={name} />
+              <FormInput label="Descrição" setValue={setDescription} value={description} />
+              <GoldButton
+                title="Salvar"
+                onPress={save}
+                style={styles.button}
+              />
 
-            {error && error.map((e) => <Text key={e} style={styles.error}>{e}</Text>)}
-          </View>
+              {error && error.map((e) => <Text key={e} style={styles.error}>{e}</Text>)}
+            </View>
+          </>}
         </View>
         
       </MainView>

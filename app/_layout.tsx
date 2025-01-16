@@ -36,7 +36,7 @@ export default function RootLayout() {
         <Stack.Screen name="auth/emailVerification" options={header({ title: "Verificação" })}/>
         
         <Stack.Screen name="company/reward/index" options={header({ title: "Recompensas" })}/>
-        <Stack.Screen name="company/reward/createReward" options={header({ title: "Nova Recompensa" })}/>
+        <Stack.Screen name="company/reward/createOrEdit" options={header({ title: "Nova Recompensa" })}/>
         <Stack.Screen name="company/reward/editReward" options={header({ title: "Nome da Recompensa sendo editada" })}/>
 
         <Stack.Screen name="company/promotion/index" options={header({ title: "Promoções" })}/>

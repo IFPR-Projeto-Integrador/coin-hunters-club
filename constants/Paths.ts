@@ -3,7 +3,7 @@ export enum Paths {
     HOME = '/',
 
     REWARD = '/company/reward',
-    CREATE_REWARD = '/company/reward/createReward',
+    EDIT_OR_CREATE_REWARD = '/company/reward/createOrEdit',
 
     PROMOTION = '/company/promotion',
     CREATE_PROMOTION = '/company/promotion/createPromotion',

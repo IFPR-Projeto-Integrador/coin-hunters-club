@@ -3,12 +3,20 @@ import { Reward, rewardCollection, RewardError } from "./types";
 import db from "@/firebase/config";
 import { isValidReward, validateReward } from "./validation";
 
-export async function asyncGetRewards(client: CHCUser): Promise<Reward[]> {
+export async function asyncGetUserRewards(client: CHCUser): Promise<Reward[]> {
     const collectionRef = db.collection(db.store, "usuarios", client.uid, rewardCollection);
 
     const allRewards = await db.getDocs(collectionRef);
     
     return allRewards.docs.map(doc => doc.data() as Reward);
+}
+
+export async function asyncGetRewardById(rewardId: string, client: CHCUser): Promise<Reward | null> {
+    const docRef = db.doc(db.store, "usuarios", client.uid, rewardCollection, rewardId);
+
+    const reward = (await db.getDoc(docRef)).data() as Reward;
+
+    return reward;
 }
 
 export async function asyncCreateReward(reward: Reward, client: CHCUser): Promise<Reward | RewardError[]> {
