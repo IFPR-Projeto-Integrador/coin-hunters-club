@@ -8,6 +8,7 @@ import { StdStyles } from "@/constants/Styles";
 import { useAuth } from "@/context/authContext";
 import { AuthError, asyncDeleteUser, asyncEditUserEmailAndPassword, errorToString, asyncLogout, UserType } from "@/firebase/user/user";
 import headerConfig from "@/helper/headerConfig";
+import { confirm } from "@/helper/popups";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Text, View, StyleSheet, Alert } from "react-native";
@@ -87,29 +88,19 @@ export default function EditPerfil() {
             return;
         }
 
-        Alert.alert(
-            'Confirmação de deleção de conta',
-            'Você tem certeza que deseja deletar sua conta? Essa ação é irreversível.',
-            [
-                {
-                    text: 'Cancelar',
-                },
-                { 
-                    text: 'Sim', 
-                    onPress: async () => {
-                        const result = await asyncDeleteUser(confirmarSenha)
+        const answer = confirm("Deletar conta", "Deseja realmente deletar sua conta?");
 
-                        if (typeof result === "string") {
-                            setErro([errorToString(result)]);
-                            return;
-                        }
+        if (!answer)
+            return;
+        
+        const result = await asyncDeleteUser(confirmarSenha)
 
-                        router.navigate(Paths.LOGIN);
-                    } 
-                },
-            ],
-            { cancelable: false }
-          );
+        if (typeof result === "string") {
+            setErro([errorToString(result)]);
+            return;
+        }
+
+        router.navigate(Paths.LOGIN);
     }
 
     return (
