@@ -1,5 +1,5 @@
 import { Reward } from "../reward/types";
-import { Promotion, PromotionError } from "./types";
+import { Promotion, PromotionError, PromotionReward } from "./types";
 import { Timestamp } from "firebase/firestore";
 
 export function validatePromotion(reward: Promotion): PromotionError[] {
@@ -8,6 +8,8 @@ export function validatePromotion(reward: Promotion): PromotionError[] {
     errors.push(...validPromotionName(reward.name));
     errors.push(...validPromotionDate(reward.dtStart, reward.dtEnd));
     errors.push(...validConversion(reward.conversion));
+    errors.push(...validPromotionRewardList(reward.rewards));
+    errors.push(...reward.rewards.map(validPromotionReward).flat());
 
     return errors;
 }
@@ -57,4 +59,37 @@ export function validConversion(conversion: number): PromotionError[] {
     }
 
     return errors;
+}
+
+export function validPromotionRewardList(reward: PromotionReward[]): PromotionError[] {
+    const errors: PromotionError[] = [];
+
+    if (reward == null) {
+        errors.push(PromotionError.RewardCannotBeNull);
+    }
+
+    if (reward.length == 0) {
+        errors.push(PromotionError.ThereMustBeAtLeastOneReward);
+    }
+
+    return errors;
+}
+
+export function validPromotionReward(reward: PromotionReward): PromotionError[] {
+    const errors: PromotionError[] = [];
+
+    if (reward.stock <= 0 || isNaN(reward.stock)) {
+        errors.push(PromotionError.StockMustBeAboveZero);
+    }
+
+    if (reward.unitPrice <= 0 || isNaN(reward.unitPrice)) {
+        errors.push(PromotionError.UnitPriceMustBeAboveZero);
+    }
+
+    if (reward.limitPerUser <= 0 || isNaN(reward.limitPerUser)) {
+        errors.push(PromotionError.LimitPerUserMustBeAboveZero);
+    }
+
+    return errors;
+
 }

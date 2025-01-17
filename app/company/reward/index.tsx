@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { asyncGetUserRewards, asyncDeleteReward } from "@/firebase/reward/repository";
 import Loading from "@/components/ui/Loading";
 import { confirm } from "@/helper/popups";
+import RewardCard from "@/components/ui/RewardCard";
 
 export default function IndexReward() {
     const [user, loading] = useAuth();
@@ -53,17 +54,22 @@ export default function IndexReward() {
                     {loadingRewards && <View style={styles.loading}><Loading/></View>}
                     {rewards.map(reward => {
                         return (
-                            <Pressable 
+                            // <Pressable 
+                            //     key={reward.uid} 
+                            //     style={[StdStyles.secondaryContainer, styles.itemContainer]}
+                            //     onPress={() => router.navigate(`${Paths.EDIT_OR_CREATE_REWARD}?rewardId=${reward.uid}`)}
+                            //     onLongPress={() => deleteRewardModal(reward)}>
+                            //     <Image source={{ uri: reward.imageBase64 }} style={styles.image}/>
+                            //     <View style={styles.textContainer}>
+                            //         <Text style={styles.itemText}>Nome: {reward.name}</Text>
+                            //         <Text style={styles.itemText}>Descrição: {reward.description}</Text>
+                            //     </ View>
+                            // </Pressable>
+                            <RewardCard 
                                 key={reward.uid} 
-                                style={[StdStyles.secondaryContainer, styles.itemContainer]}
-                                onPress={() => router.navigate(`${Paths.EDIT_OR_CREATE_REWARD}?rewardId=${reward.uid}`)}
-                                onLongPress={() => deleteRewardModal(reward)}>
-                                <Image source={{ uri: reward.imageBase64 }} style={styles.image}/>
-                                <View style={styles.textContainer}>
-                                    <Text style={styles.itemText}>Nome: {reward.name}</Text>
-                                    <Text style={styles.itemText}>Descrição: {reward.description}</Text>
-                                </ View>
-                            </Pressable>
+                                reward={reward} 
+                                onPress={() => router.navigate(`${Paths.EDIT_OR_CREATE_REWARD}?rewardId=${reward.uid}`)} 
+                                onLongPress={() => deleteRewardModal(reward)}/>
                         )
                     })}
                 </View>
