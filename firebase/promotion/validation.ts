@@ -91,5 +91,16 @@ export function validPromotionReward(reward: PromotionReward): PromotionError[] 
     }
 
     return errors;
+}
 
+export function promotionEnded(promotion: Promotion): boolean {
+    return promotion.dtEnd.toMillis() < Date.now();
+}
+
+export function promotionBegun(promotion: Promotion): boolean {
+    return promotion.dtStart.toMillis() <= Date.now();
+}
+
+export function promotionRunning(promotion: Promotion): boolean {
+    return promotionBegun(promotion) && !promotionEnded(promotion);
 }

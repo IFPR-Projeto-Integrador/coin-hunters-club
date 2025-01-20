@@ -11,6 +11,18 @@ export async function asyncGetPromotions(user: CHCUser): Promise<Promotion[]> {
     return allRewards.docs.map(doc => doc.data() as Promotion);
 }
 
+export async function asyncGetPromotion(user: CHCUser, uid: string): Promise<Promotion | null> {
+    const docRef = db.doc(db.store, "usuarios", user.uid, promotionCollection, uid);
+
+    const doc = await db.getDoc(docRef);
+
+    if (!doc.exists) {
+        return null;
+    }
+
+    return doc.data() as Promotion;
+}
+
 export async function asyncCreatePromotion(promotion: Promotion, client: CHCUser): Promise<Promotion | PromotionError[]> {
     if (!isValidPromotion(promotion)) {
         const errors = validatePromotion(promotion);

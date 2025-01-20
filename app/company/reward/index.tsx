@@ -50,7 +50,7 @@ export default function IndexReward() {
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
                     <GoldButton title="Cadastrar Recompensa" onPress={() => router.navigate(Paths.EDIT_OR_CREATE_REWARD)} style={[styles.button]}/>
                 </View>
-                <View>
+                <View style={[styles.mainContainer]}>
                     {loadingRewards && <View style={styles.loading}><Loading/></View>}
                     {rewards.map(reward => {
                         return (

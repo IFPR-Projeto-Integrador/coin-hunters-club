@@ -7,6 +7,7 @@ export enum Paths {
 
     PROMOTION = '/company/promotion',
     CREATE_PROMOTION = '/company/promotion/createPromotion',
+    EDIT_PROMOTION = '/company/promotion/editPromotion',
 
     EMPLOYEE = '/company/employee',
     CREATE_EMPLOYEE = '/company/employee/createEmployee',
