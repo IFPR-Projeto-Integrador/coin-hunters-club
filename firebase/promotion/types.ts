@@ -20,10 +20,9 @@ export enum PromotionError {
     // Validation Errors
     EndBeforeIni, IniAndEndEqual, PromotionCannotBeInThePast, PromotionNameTooLong, PromotionNameTooShort, ConversionCannotEqualOrLessZero,
     RewardCannotBeNull, ThereMustBeAtLeastOneReward, StockMustBeAboveZero, UnitPriceMustBeAboveZero, LimitPerUserMustBeAboveZero,
-    
 
     // Repository Errors
-    PromotionAlreadyExists, PromotionDoesNotExist
+    PromotionAlreadyExists, PromotionDoesNotExist, PromotionOverlaps
 }
 
 export function promotionErrorToUser(error: PromotionError): string {
@@ -54,6 +53,8 @@ export function promotionErrorToUser(error: PromotionError): string {
             return "Preço unitário deve ser maior que zero";
         case PromotionError.LimitPerUserMustBeAboveZero:
             return "Limite por usuário deve ser maior que zero";
+        case PromotionError.PromotionOverlaps:
+            return "Promoção não pode sobrepor outra promoção";
     }
 }
 

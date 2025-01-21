@@ -33,6 +33,15 @@ export async function asyncCreatePromotion(promotion: Promotion, client: CHCUser
         return [PromotionError.PromotionAlreadyExists];
     }
 
+    // Checks if there is already a promotion within the same period
+    const allPromotions = await asyncGetPromotions(client);
+    const overlappingPromotion = allPromotions.find(existingPromotion => 
+        promotion.dtStart <= existingPromotion.dtEnd && promotion.dtEnd >= existingPromotion.dtStart);
+
+    if (overlappingPromotion) {
+        return [PromotionError.PromotionOverlaps];
+    }
+
     promotion.uid = "";
 
     const collectionRef = db.collection(db.store, "usuarios", client.uid, promotionCollection);
