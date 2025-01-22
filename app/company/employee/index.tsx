@@ -10,11 +10,17 @@ import Root from "@/components/Root";
 export default function IndexCompanyEmployee() {
     const [user, loading] = useAuth();
 
+    if (loading)
+        return null;
+
+    if (!user)
+        return null;
+
     return (
         <Root requireAuth>
             <MainView>
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
-                    <GoldButton title="Cadastrar Funcionário" onPress={() => router.navigate(Paths.CREATE_EMPLOYEE)} style={[styles.button]}/>
+                    <GoldButton title="Cadastrar Funcionário" onPress={() => router.navigate(`${Paths.REGISTER}?uidEmpresa=${user.uid}`)} style={[styles.button]}/>
                 </View>
             </MainView>
         </Root>

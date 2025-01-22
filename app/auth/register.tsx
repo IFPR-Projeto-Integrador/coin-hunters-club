@@ -8,9 +8,14 @@ import { useState } from "react";
 import { StyleSheet, View, Text, Pressable } from "react-native";
 import { router } from 'expo-router';
 import { Paths } from "@/constants/Paths";
+import { useRoute } from "@react-navigation/native";
+import headerConfig from "@/helper/headerConfig";
 
 export default function Register() {
-    const [tab, setTab] = useState<"cliente" | "empresa">("cliente");
+    const route = useRoute();
+    const { uidEmpresa } = route.params as { uidEmpresa: string | undefined};
+
+    const [tab, setTab] = useState<"cliente" | "empresa" | "funcionario">(uidEmpresa ? "funcionario" : "cliente");
     const [error, setError] = useState<string[]>([]);
 
     const [login, setLogin] = useState("");
@@ -20,6 +25,9 @@ export default function Register() {
     const [confirmemail, setConfirmemail] = useState("");
     const [nome, setNome] = useState("");
     const [cpfCnpj, setCpfCnpj] = useState("");
+    const [senhaAtual, setSenhaAtual] = useState("");
+
+    headerConfig({ title: "Cadastro de Funcionario", show: uidEmpresa ? true : false });
 
     async function cadastrar() {
         const errors = validate();
@@ -36,8 +44,10 @@ export default function Register() {
             email,
             dtNascimento: null,
             cpfCnpj,
-            tipoUsuario: tab === "cliente" ? UserType.CLIENTE : UserType.EMPRESA,
-            senha
+            tipoUsuario: tab === "cliente" ? UserType.CLIENTE : tab === "funcionario" ? UserType.FUNCIONARIO : UserType.EMPRESA,
+            senha,
+            senhaAtual: senhaAtual === "" ? undefined : senhaAtual,
+            uidEmpresa: uidEmpresa === undefined ? null : uidEmpresa
         };
 
         const result = await asyncRegister(user);
@@ -47,7 +57,11 @@ export default function Register() {
             return
         }
 
-        router.navigate("/");
+        if (uidEmpresa) {
+            router.navigate(Paths.EMPLOYEE)
+        }
+        else
+            router.navigate("/");
     }
 
     function validate(): string[] {
@@ -84,7 +98,7 @@ export default function Register() {
             errors.push("Nome inválido");
         }
 
-        if (tab === "cliente") {
+        if (tab === "cliente" || tab === "funcionario") {
             if (cpfCnpj.length !== 11) {
                 errors.push("CPF não possui caractéres o suficiente");
             }
@@ -105,12 +119,14 @@ export default function Register() {
 
     return (
         <MainView>
-            <CHCLogo />
+            { tab !== "funcionario" && <CHCLogo />}
             <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
-                <View style={styles.buttonContainer}>
-                    <GoldButton title="Cliente" onPress={() => setTab("cliente")} active={tab === "cliente"} style={[styles.tabButton, { marginRight: 10 }]} />
-                    <GoldButton title="Empresa" onPress={() => setTab("empresa")} active={tab === "empresa"} style={styles.tabButton} />
-                </View>
+                { tab !== "funcionario" && (
+                    <View style={styles.buttonContainer}>
+                        <GoldButton title="Cliente" onPress={() => setTab("cliente")} active={tab === "cliente"} style={[styles.tabButton, { marginRight: 10 }]} />
+                        <GoldButton title="Empresa" onPress={() => setTab("empresa")} active={tab === "empresa"} style={styles.tabButton} />
+                    </View>
+                ) }
 
                 { error.length != 0 && error.map((value) => <Text key={value} style={styles.errorMessage}>{value}</Text>) }
 
@@ -120,13 +136,18 @@ export default function Register() {
                 <FormInput label="Email" placeholder="Digite seu email" setValue={setEmail} value={email} />
                 <FormInput label="Confirmar Email" placeholder="Confirme seu email" setValue={setConfirmemail} value={confirmemail} />
                 <FormInput label="Nome" placeholder={tab == "empresa" ? "Digite o nome da empresa" : "Digite o seu nome"} setValue={setNome} value={nome} />
-                <FormInput label={tab === "cliente" ? "CPF" : "CNPJ"} setValue={setCpfCnpj} value={cpfCnpj} placeholder={tab == "empresa" ? "Digite seu CNPJ" : "Digite seu CPF"}/>
+                <FormInput label={tab === "cliente" || tab === "funcionario" ? "CPF" : "CNPJ"} setValue={setCpfCnpj} value={cpfCnpj} placeholder={tab == "empresa" ? "Digite seu CNPJ" : "Digite seu CPF"}/>
+                { uidEmpresa && (
+                    <FormInput label="Senha atual" setValue={setSenhaAtual} value={senhaAtual} placeholder="Senha atual" password/>
+                ) }
 
                 <GoldButton title="Cadastrar-se" onPress={cadastrar} style={styles.registerButton}></GoldButton>
-                <GoldButton title="Retornar a tela de login" onPress={async () => {
-                    await asyncLogout();
-                    router.navigate(Paths.LOGIN);
-                }} />
+                { !uidEmpresa && (
+                    <GoldButton title="Retornar a tela de login" onPress={async () => {
+                        await asyncLogout();
+                        router.navigate(Paths.LOGIN);
+                    }} />
+                ) }
             </View>
         </MainView>
     )

@@ -17,11 +17,13 @@ export interface CHCUser {
     dtNascimento: string | null;
     cpfCnpj: string | null;
     tipoUsuario: UserType;
+    uidEmpresa: string | null;
     firestoreUser?: User;
 }
 
 export interface RegisterInformation {
     senha: string;
+    senhaAtual?: string;
 }
 
 export enum AuthError {
@@ -68,17 +70,23 @@ export async function asyncGetAllUsers() {
     });
 }
 
-export async function asyncLogin(login: string, senha: string): Promise<CHCUser | AuthError> {
+export async function asyncLogin(login: string, senha: string, email?: string): Promise<CHCUser | AuthError> {
     try {
-        const usuariosCollection = db.collection(db.store, "usuarios");
-        const usuarioQuery = db.query(usuariosCollection, db.where("login", "==", login));
-        const usuario = await db.getDocs(usuarioQuery);
-        
-        if (usuario.docs.length === 0) {
-            return AuthError.USER_NOT_FOUND;
+        if (login) {
+            const usuariosCollection = db.collection(db.store, "usuarios");
+            const usuarioQuery = db.query(usuariosCollection, db.where("login", "==", login));
+            const usuario = await db.getDocs(usuarioQuery);
+            
+            if (usuario.docs.length === 0) {
+                return AuthError.USER_NOT_FOUND;
+            }
+
+            email = usuario.docs[0].data().email as string;
         }
 
-        const email = usuario.docs[0].data().email;
+        if (email == null) {
+            return AuthError.INVALID_EMAIL;
+        }
 
         await db.signInWithEmailAndPassword(db.auth, email, senha);
 
@@ -102,9 +110,21 @@ export async function asyncLogout() {
     }
 }
 
-export async function asyncRegister({login, nome, email, senha, dtNascimento, cpfCnpj, tipoUsuario}: CHCUser & RegisterInformation):
+export async function asyncRegister({login, nome, email, senha, senhaAtual, dtNascimento, cpfCnpj, tipoUsuario, uidEmpresa }: CHCUser & RegisterInformation):
     Promise<CHCUser | AuthError> {
     try {
+        let currentPasswordCorrect: boolean | null;
+        if (uidEmpresa) {
+            currentPasswordCorrect = await passwordCorrect(senhaAtual!);
+            if (!currentPasswordCorrect) {
+                return AuthError.WRONG_PASSWORD;
+            }
+        }
+        else {
+            currentPasswordCorrect = null;
+        }
+
+        const previousEmail = db.auth.currentUser?.email;
         const userCredential = await db.createUserWithEmailAndPassword(db.auth, email, senha);
         const authUser = userCredential.user;
 
@@ -119,10 +139,16 @@ export async function asyncRegister({login, nome, email, senha, dtNascimento, cp
             nome,
             dtNascimento,
             cpfCnpj,
-            tipoUsuario
+            tipoUsuario,
+            uidEmpresa
         }
 
         await db.setDoc(db.doc(db.store, "usuarios", authUser.uid), dbUser);
+
+        if (uidEmpresa && senhaAtual && currentPasswordCorrect && previousEmail) {
+            await asyncLogout();
+            await asyncLogin("", senhaAtual, previousEmail);
+        }
 
         return dbUser;
     } catch (error) {
@@ -271,6 +297,22 @@ function codeToError(errorCode: string): AuthError {
 async function asyncReAuth(user: User, password: string) {
     const credential = db.EmailAuthProvider.credential(user.email!, password);
     await db.reauthenticateWithCredential(user, credential);
+}
+
+async function passwordCorrect(password: string): Promise<boolean> {
+    try {
+        const user = db.auth.currentUser;
+    
+        if (!user) {
+            return false;
+        }
+    
+        const credential = db.EmailAuthProvider.credential(user.email!, password);
+        await db.reauthenticateWithCredential(user, credential);
+        return true;
+    } catch (error) {
+        return false;
+    }
 }
 
 export function errorToString(error: AuthError): string {

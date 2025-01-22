@@ -70,15 +70,6 @@ export default function IndexCompany() {
                 <GoldButton title="Recompensas" onPress={() => router.navigate(Paths.REWARD)} style={[styles.button]}/>
                 <GoldButton title="Promoções" onPress={() => router.navigate(Paths.PROMOTION)} style={[styles.button]}/>
                 <GoldButton title="Funcionários" onPress={() => router.navigate(Paths.EMPLOYEE)} style={[styles.button]}/>
-
-                { user != null ?
-                    <>
-                        <GoldButton title="Read all" onPress={async () => console.log(await promotions.asyncGetPromotions(user))} style={[styles.button]}></GoldButton>
-                        <GoldButton title="Create new" onPress={createNew} style={[styles.button]}></GoldButton>
-                        <GoldButton title="Edit last" onPress={editLast} style={[styles.button]}></GoldButton>
-                        <GoldButton title="Delete last" onPress={deleteLast} style={[styles.button]}></GoldButton>
-                    </>
-                : undefined}
             </View>
         </MainView>
     )
