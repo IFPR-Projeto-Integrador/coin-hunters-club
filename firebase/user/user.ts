@@ -19,6 +19,7 @@ export interface CHCUser {
     tipoUsuario: UserType;
     uidEmpresa: string | null;
     firestoreUser?: User;
+    deleted?: boolean
 }
 
 export interface RegisterInformation {
@@ -50,7 +51,7 @@ export async function asyncGetLoggedUser(): Promise<CHCUser | null> {
 export async function asyncGetUser(id: string): Promise<CHCUser | null> {
     const usuariosCollection = db.collection(db.store, "usuarios");
 
-    const usuarioQuery = db.query(usuariosCollection, db.where(db.documentId(), "==", id));
+    const usuarioQuery = db.query(usuariosCollection, db.where(db.documentId(), "==", id), db.where("deleted", "==", false));
     const usuario = await db.getDocs(usuarioQuery);
 
     return usuario.docs.map((doc) => {
@@ -61,8 +62,8 @@ export async function asyncGetUser(id: string): Promise<CHCUser | null> {
 
 export async function asyncGetAllUsers() {
     const usuariosCollection = db.collection(db.store, "usuarios");
-    // Select only name and email fields
-    const usuarios = await db.getDocs(usuariosCollection);
+    const usuariosQuery = db.query(usuariosCollection, db.where("deleted", "==", false));
+    const usuarios = await db.getDocs(usuariosQuery);
 
     return usuarios.docs.map((doc) => {
         const data = doc.data();
@@ -70,18 +71,42 @@ export async function asyncGetAllUsers() {
     });
 }
 
+export async function asyncGetEmployees() {
+    const usuariosCollection = db.collection(db.store, "usuarios");
+    const usuariosQuery = db.query(usuariosCollection, 
+        db.where("tipoUsuario", "==", UserType.FUNCIONARIO),
+        db.where("uidEmpresa", "==", db.auth.currentUser?.uid),
+        db.where("deleted", "==", false));
+    const usuarios = await db.getDocs(usuariosQuery);
+
+    return usuarios.docs.map((doc) => {
+        const data = doc.data();
+        return { ...data, uid: doc.id } as CHCUser
+    });
+
+}
+
 export async function asyncLogin(login: string, senha: string, email?: string): Promise<CHCUser | AuthError> {
     try {
         if (login) {
             const usuariosCollection = db.collection(db.store, "usuarios");
             const usuarioQuery = db.query(usuariosCollection, db.where("login", "==", login));
-            const usuario = await db.getDocs(usuarioQuery);
+            const usuarioDocs = await db.getDocs(usuarioQuery);
             
-            if (usuario.docs.length === 0) {
+            if (usuarioDocs.docs.length === 0) {
                 return AuthError.USER_NOT_FOUND;
             }
 
-            email = usuario.docs[0].data().email as string;
+            const usuario = usuarioDocs.docs[0].data() as CHCUser;
+
+            if (usuario.deleted) {
+                await db.signInWithEmailAndPassword(db.auth, usuario.email, senha);
+                await asyncDeleteUser(senha);
+
+                return AuthError.USER_NOT_FOUND;
+            }
+
+            email = usuario.email;
         }
 
         if (email == null) {
@@ -140,7 +165,8 @@ export async function asyncRegister({login, nome, email, senha, senhaAtual, dtNa
             dtNascimento,
             cpfCnpj,
             tipoUsuario,
-            uidEmpresa
+            uidEmpresa,
+            deleted: false
         }
 
         await db.setDoc(db.doc(db.store, "usuarios", authUser.uid), dbUser);
@@ -160,9 +186,17 @@ export async function asyncRegister({login, nome, email, senha, senhaAtual, dtNa
     throw new Error("'register' function should not reach this point");
 }
 
+export async function asyncMarkEmployeeForDeletion(uid: string) {
+    try {
+        const userDocRef = db.doc(db.store, "usuarios", uid);
+        await db.updateDoc(userDocRef, { deleted: true });
+    } catch (error) {
+        console.error("Error marking employee for deletion:", error);
+    }
+}
+
 export async function asyncDeleteUser(password: string): Promise<AuthError | undefined> {
     try {
-        debugger;
         const user = db.auth.currentUser;
     
         if (!user) {

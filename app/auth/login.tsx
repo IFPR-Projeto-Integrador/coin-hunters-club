@@ -22,7 +22,8 @@ export default function LoginScreen() {
     return <Loading />
   }  
 
-  if (user) {
+  if (user && user.deleted == false) {
+
     return <Redirect href={Paths.HOME} />;
   }
 

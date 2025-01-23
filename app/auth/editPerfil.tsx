@@ -8,7 +8,7 @@ import { StdStyles } from "@/constants/Styles";
 import { useAuth } from "@/context/authContext";
 import { AuthError, asyncDeleteUser, asyncEditUserEmailAndPassword, errorToString, asyncLogout, UserType } from "@/firebase/user/user";
 import headerConfig from "@/helper/headerConfig";
-import { confirm } from "@/helper/popups";
+import { confirmPopup } from "@/helper/popups";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Text, View, StyleSheet, Alert } from "react-native";
@@ -88,7 +88,7 @@ export default function EditPerfil() {
             return;
         }
 
-        const answer = confirm("Deletar conta", "Deseja realmente deletar sua conta?");
+        const answer = confirmPopup("Deletar conta", "Deseja realmente deletar sua conta?");
 
         if (!answer)
             return;

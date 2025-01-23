@@ -10,6 +10,7 @@ import React from "react";
 import { Promotion } from "@/firebase/promotion/types";
 import * as promotions from "@/firebase/promotion/repository";
 import { Timestamp } from "firebase/firestore";
+import Loading from "@/components/ui/Loading";
 
 export default function IndexCompany() {
     const [user, loading] = useAuth();
@@ -17,51 +18,7 @@ export default function IndexCompany() {
     headerConfig({ title: user?.nome ?? "Empresa" });
 
     if (loading) {
-        return null;
-    }
-
-    async function createNew() {
-        const now = new Date();
-        const nowPlusFive = new Date(now.getTime() + 5 * 60000);
-        const nowPlusTen = new Date(now.getTime() + 10 * 60000);
-
-        const promotion: Promotion = {
-            uid: undefined,
-            name: "Recompensa",
-            dtStart: Timestamp.fromDate(nowPlusFive),
-            dtEnd: Timestamp.fromDate(nowPlusTen),
-            conversion: 10,
-            rewards: []
-        } 
-        const result = await promotions.asyncCreatePromotion(promotion, user!);
-
-        if (result == null)
-            console.log("Erro ao criar promoção");
-        else
-            console.log("Promoção criada com sucesso: ", result);
-    }
-
-    async function editLast() {
-        const allPromotions = await promotions.asyncGetPromotions(user!);
-        const promotion = allPromotions[allPromotions.length - 1];
-        const result = await promotions.asyncEditPromotionName(promotion, user!, "Promoção Editada");
-
-        if (result == null)
-            console.log("Erro ao editar promoção");
-        else
-            console.log("Promoção editada com sucesso: ", result)
-    }
-
-    async function deleteLast() {
-        const allPromotions = await promotions.asyncGetPromotions(user!);
-        const promotion: Promotion = allPromotions[allPromotions.length - 1];
-        if (promotion == null) {
-            console.log("Nenhuma promoção para deletar");
-            return;
-        }
-        await promotions.asyncDeletePromotion(promotion, user!);
-
-        console.log("Deletado promoção com sucesso!");
+        return <Loading />;
     }
 
     return (

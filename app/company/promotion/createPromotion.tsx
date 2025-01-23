@@ -17,7 +17,7 @@ import { Reward } from "@/firebase/reward/types";
 import { asyncGetUserRewards } from "@/firebase/reward/repository";
 import RewardCard from "@/components/ui/RewardCard";
 import { Colors } from "@/constants/Colors";
-import { confirm } from "@/helper/popups";
+import { confirmPopup } from "@/helper/popups";
 import { validPromotionReward } from "@/firebase/promotion/validation";
 
 export default function CreatePromotion() {
@@ -150,7 +150,7 @@ export default function CreatePromotion() {
                 key={reward.uidReward} 
                 backgroundColor={Colors.panel}
                 onPress={async () => {
-                  const result = await confirm("Remover recompensa", "Deseja remover a recompensa?");
+                  const result = await confirmPopup("Remover recompensa", "Deseja remover a recompensa?");
                   if (result) {
                     setVinculatedRewards(vinculatedRewards.filter((_, i) => i !== index));
                   }

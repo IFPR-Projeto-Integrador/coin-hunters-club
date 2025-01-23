@@ -14,6 +14,10 @@ export default function Index() {
       return <Loading />;
     }
 
+    if (!user) {
+        return <Loading />
+    }
+
     let screen: React.JSX.Element | null = null;
 
     if (user?.tipoUsuario === UserType.EMPRESA) {
@@ -27,7 +31,7 @@ export default function Index() {
     }
 
     return (
-        <Root accountButton = {true} requireAuth = {true}>
+        <Root accountButton requireAuth>
             { screen }
         </Root>
     )

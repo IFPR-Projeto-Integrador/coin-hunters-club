@@ -10,7 +10,7 @@ import { Reward } from "@/firebase/reward/types";
 import { useEffect, useState } from "react";
 import { asyncGetUserRewards, asyncDeleteReward } from "@/firebase/reward/repository";
 import Loading from "@/components/ui/Loading";
-import { confirm } from "@/helper/popups";
+import { confirmPopup } from "@/helper/popups";
 import RewardCard from "@/components/ui/RewardCard";
 
 export default function IndexReward() {
@@ -36,7 +36,7 @@ export default function IndexReward() {
     }, [user, reloadEffect]);
 
     async function deleteRewardModal(reward: Reward) {
-        const result = await confirm("Excluir recompensa", "Deseja realmente excluir a recompensa?");
+        const result = await confirmPopup("Excluir recompensa", "Deseja realmente excluir a recompensa?");
 
         if (result && user) {
             await asyncDeleteReward(reward, user);

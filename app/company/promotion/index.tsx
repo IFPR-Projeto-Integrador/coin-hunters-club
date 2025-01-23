@@ -14,7 +14,7 @@ import { dateToString } from "@/helper/dates";
 import IconButton from "@/components/ui/IconButton";
 import Loading from "@/components/ui/Loading";
 import { promotionEnded, promotionRunning } from "@/firebase/promotion/validation";
-import { confirm } from "@/helper/popups";
+import { confirmPopup } from "@/helper/popups";
 
 export default function IndexPromotion() {
     const [user, loading] = useAuth();
@@ -43,7 +43,7 @@ export default function IndexPromotion() {
     }
 
     async function deletePromotion(promotion: Promotion) {
-        const result = await confirm("Excluir recompensa", "Deseja realmente excluir a recompensa?");
+        const result = await confirmPopup("Excluir recompensa", "Deseja realmente excluir a recompensa?");
 
         if (result && user) {
             await asyncDeletePromotion(promotion, user);

@@ -1,6 +1,6 @@
 import { Alert, Platform } from "react-native";
 
-export async function confirm(title: string, message: string): Promise<boolean> {
+export async function confirmPopup(title: string, message: string): Promise<boolean> {
     if (Platform.OS === "android") {
         return new Promise<boolean>((resolve) => {
             Alert.alert(title, message, [

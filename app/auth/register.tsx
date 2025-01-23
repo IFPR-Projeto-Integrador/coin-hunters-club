@@ -18,13 +18,13 @@ export default function Register() {
     const [tab, setTab] = useState<"cliente" | "empresa" | "funcionario">(uidEmpresa ? "funcionario" : "cliente");
     const [error, setError] = useState<string[]>([]);
 
-    const [login, setLogin] = useState("");
-    const [senha, setSenha] = useState("");
-    const [confirmsenha, setConfirmsenha] = useState("");
-    const [email, setEmail] = useState("");
-    const [confirmemail, setConfirmemail] = useState("");
-    const [nome, setNome] = useState("");
-    const [cpfCnpj, setCpfCnpj] = useState("");
+    const [login, setLogin] = useState("lulialmir");
+    const [senha, setSenha] = useState("Batata!123");
+    const [confirmsenha, setConfirmsenha] = useState("Batata!123");
+    const [email, setEmail] = useState("lulialmir@gmail.com");
+    const [confirmemail, setConfirmemail] = useState("lulialmir@gmail.com");
+    const [nome, setNome] = useState("Yuri");
+    const [cpfCnpj, setCpfCnpj] = useState("14459855941");
     const [senhaAtual, setSenhaAtual] = useState("");
 
     headerConfig({ title: "Cadastro de Funcionario", show: uidEmpresa ? true : false });
@@ -138,7 +138,7 @@ export default function Register() {
                 <FormInput label="Nome" placeholder={tab == "empresa" ? "Digite o nome da empresa" : "Digite o seu nome"} setValue={setNome} value={nome} />
                 <FormInput label={tab === "cliente" || tab === "funcionario" ? "CPF" : "CNPJ"} setValue={setCpfCnpj} value={cpfCnpj} placeholder={tab == "empresa" ? "Digite seu CNPJ" : "Digite seu CPF"}/>
                 { uidEmpresa && (
-                    <FormInput label="Senha atual" setValue={setSenhaAtual} value={senhaAtual} placeholder="Senha atual" password/>
+                    <FormInput label="Senha atual da empresa" setValue={setSenhaAtual} value={senhaAtual} placeholder="Senha atual" password/>
                 ) }
 
                 <GoldButton title="Cadastrar-se" onPress={cadastrar} style={styles.registerButton}></GoldButton>
