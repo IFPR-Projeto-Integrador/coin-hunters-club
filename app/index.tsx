@@ -6,6 +6,8 @@ import IndexClient from "./client";
 import IndexEmployee from "./employee";
 import React from "react";
 import Loading from "@/components/ui/Loading";
+import { Redirect } from "expo-router";
+import { Paths } from "@/constants/Paths";
 
 export default function Index() {
     const [user, loading] = useAuth();
@@ -15,7 +17,7 @@ export default function Index() {
     }
 
     if (!user) {
-        return <Loading />
+        return <Redirect href={Paths.LOGIN}/>
     }
 
     let screen: React.JSX.Element | null = null;

@@ -18,13 +18,13 @@ export default function Register() {
     const [tab, setTab] = useState<"cliente" | "empresa" | "funcionario">(uidEmpresa ? "funcionario" : "cliente");
     const [error, setError] = useState<string[]>([]);
 
-    const [login, setLogin] = useState("lulialmir");
-    const [senha, setSenha] = useState("Batata!123");
-    const [confirmsenha, setConfirmsenha] = useState("Batata!123");
-    const [email, setEmail] = useState("lulialmir@gmail.com");
-    const [confirmemail, setConfirmemail] = useState("lulialmir@gmail.com");
-    const [nome, setNome] = useState("Yuri");
-    const [cpfCnpj, setCpfCnpj] = useState("14459855941");
+    const [login, setLogin] = useState("");
+    const [senha, setSenha] = useState("");
+    const [confirmsenha, setConfirmsenha] = useState("");
+    const [email, setEmail] = useState("");
+    const [confirmemail, setConfirmemail] = useState("");
+    const [nome, setNome] = useState("");
+    const [cpfCnpj, setCpfCnpj] = useState("");
     const [senhaAtual, setSenhaAtual] = useState("");
 
     headerConfig({ title: "Cadastro de Funcionario", show: uidEmpresa ? true : false });
