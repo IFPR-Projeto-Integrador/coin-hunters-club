@@ -305,8 +305,6 @@ export async function asyncSendConfirmationEmail(): Promise<boolean> {
 }
 
 function codeToError(errorCode: string): AuthError {
-    console.log("errorCode", errorCode);
-
     switch (errorCode) {
         case AuthError.INVALID_EMAIL:
             return AuthError.INVALID_EMAIL;

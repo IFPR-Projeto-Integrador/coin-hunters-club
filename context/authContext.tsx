@@ -21,7 +21,6 @@ export const AuthProvider = ({ children }: Props) => {
             
             asyncGetUser(currentUser.uid)
                 .then(loggedUser => {
-                    console.log("Auth state changed: ", loggedUser)
                     if (loggedUser?.deleted) {
                         setUser(null);
                         setLoading(false);

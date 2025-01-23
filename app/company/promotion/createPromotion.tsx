@@ -61,8 +61,6 @@ export default function CreatePromotion() {
       return;
     }
 
-    debugger;
-
     const reward: PromotionReward & { reward: Reward } = {
       uidReward: selectedReward.uid as string,
       stock: parseInt(stock),
