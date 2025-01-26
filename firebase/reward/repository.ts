@@ -19,6 +19,31 @@ export async function asyncGetRewardById(rewardId: string, client: CHCUser): Pro
     return reward;
 }
 
+export async function asyncGetManyRewardsById(rewardIds: string[]): Promise<Reward[]> {
+    if (rewardIds.length == 0) {
+        return [];
+    }
+
+    const collectionRef = db.collection(db.store, "usuarios");
+    const usersQuery = db.query(collectionRef, db.where("tipoUsuario", "==", "empresa"));
+    const allEmpresas = await db.getDocs(usersQuery);
+    const allIds = allEmpresas.docs.map(doc => doc.id);
+
+    const rewards = [] as Reward[];
+
+    for (const id of allIds) {
+        const query = db.query(db.collection(db.store, "usuarios", id, rewardCollection),
+        db.where(db.documentId(), "in", rewardIds));
+        const reward = (await db.getDocs(query)).docs.map(doc => doc.data() as Reward);
+
+        for (const r of reward) {
+            rewards.push(r);
+        }
+    }
+
+    return rewards;
+}
+
 export async function asyncCreateReward(reward: Reward, client: CHCUser): Promise<Reward | RewardError[]> {
     if (!isValidReward(reward)) {
         const errors = validateReward(reward);

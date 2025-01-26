@@ -45,9 +45,9 @@ export default function RootLayout() {
         <Stack.Screen name="company/employee/index" options={header({ title: "Funcionários" })}/>
         <Stack.Screen name="company/employee/createEmployee" options={header({ title: "Novo Funcionário" })}/>
 
-        <Stack.Screen name="empresa/index" options={header({ title: "Empresa" })} />
+        <Stack.Screen name="company/index" options={header({ title: "Empresa" })} />
 
-        <Stack.Screen name="cliente/index" options={{ headerShown: false }}/>
+        <Stack.Screen name="client/index" options={header({ title: "Promoções" })}/>
 
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" options={{ headerShown: false }}/>

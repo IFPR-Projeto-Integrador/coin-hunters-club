@@ -12,15 +12,14 @@ export default function Loading() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.panel, // Optional: Dim background
+    backgroundColor: Colors.panel,
     position: 'absolute',
+    width: "100%",
+    height: "100%",
     top: 0,
     left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 999, // Ensure it overlays other elements
+    zIndex: 999,
   },
 });

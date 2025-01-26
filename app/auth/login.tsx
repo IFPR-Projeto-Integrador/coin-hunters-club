@@ -18,12 +18,9 @@ export default function LoginScreen() {
   const [error, setError] = useState<string | null>(null)
   const [user, loading] = useAuth();
 
-  console.log("Pre loading")
   if (loading) {
-    console.log("Loading")
     return <Loading />
-  }  
-  console.log("Post loading")
+  }
 
   if (user && user.deleted == false) {
 

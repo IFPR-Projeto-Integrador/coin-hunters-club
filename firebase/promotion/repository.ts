@@ -1,14 +1,21 @@
 import { CHCUser } from "../user/user";
 import { Promotion, promotionCollection, PromotionError } from "./types";
 import db from "@/firebase/config";
-import { isValidPromotion, validatePromotion } from "./validation";
+import { isValidPromotion, promotionRunning, validatePromotion } from "./validation";
 
-export async function asyncGetPromotions(user: CHCUser): Promise<Promotion[]> {
+interface AsyncGetUserPromotionsOptions { onlyActiveOnes?: boolean}
+export async function asyncGetUserPromotions(user: CHCUser, options?: AsyncGetUserPromotionsOptions): Promise<Promotion[]> {
     const collectionRef = db.collection(db.store, "usuarios", user.uid, promotionCollection);
 
     const allRewards = await db.getDocs(collectionRef);
+
+    let promotions = allRewards.docs.map(doc => doc.data() as Promotion);
+
+    if (options?.onlyActiveOnes) {
+        promotions = promotions.filter(promotion => promotionRunning(promotion));
+    }
     
-    return allRewards.docs.map(doc => doc.data() as Promotion);
+    return promotions;
 }
 
 export async function asyncGetPromotion(user: CHCUser, uid: string): Promise<Promotion | null> {
@@ -34,7 +41,7 @@ export async function asyncCreatePromotion(promotion: Promotion, client: CHCUser
     }
 
     // Checks if there is already a promotion within the same period
-    const allPromotions = await asyncGetPromotions(client);
+    const allPromotions = await asyncGetUserPromotions(client);
     const overlappingPromotion = allPromotions.find(existingPromotion => 
         promotion.dtStart <= existingPromotion.dtEnd && promotion.dtEnd >= existingPromotion.dtStart);
 

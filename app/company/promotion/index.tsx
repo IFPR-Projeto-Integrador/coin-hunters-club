@@ -8,7 +8,7 @@ import { Paths } from "@/constants/Paths";
 import Root from "@/components/Root";
 import { useEffect, useState } from "react";
 import { Promotion } from "@/firebase/promotion/types";
-import { asyncDeletePromotion, asyncGetPromotions } from "@/firebase/promotion/repository";
+import { asyncDeletePromotion, asyncGetUserPromotions } from "@/firebase/promotion/repository";
 import { Colors } from "@/constants/Colors";
 import { dateToString } from "@/helper/dates";
 import IconButton from "@/components/ui/IconButton";
@@ -23,7 +23,7 @@ export default function IndexPromotion() {
     const [reloadEffect, setReloadEffect] = useState(false);
     useEffect(() => {
         if (user) {
-            asyncGetPromotions(user).then((promotions) => {
+            asyncGetUserPromotions(user).then((promotions) => {
                 promotions.sort((a, b) => {
                     if (a.dtEnd.toMillis() > Date.now() && a.dtStart.toMillis() <= Date.now())
                         return -1;
