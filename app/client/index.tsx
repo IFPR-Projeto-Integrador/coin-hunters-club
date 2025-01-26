@@ -80,7 +80,7 @@ export default function IndexClient() {
                                     <Text>{dateToString(promotion.dtStart.toDate())} - {dateToString(promotion.dtEnd.toDate())}</Text>
                                 </View>
                                 <View style={styles.ownedCoins}>
-                                    <Text>X Coins Conquistados</Text>
+                                    <Text>{promotion.wallet.coins} Coins Conquistados</Text>
                                 </View>
                                 <TouchableOpacity style={styles.leaderboard} onPress={openLeaderboard}>
                                     <Text>Leaderboard</Text>

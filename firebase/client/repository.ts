@@ -1,10 +1,39 @@
 import db from "@/firebase/config";
 import { CHCUser } from "../user/user";
 import { asyncGetUserPromotions } from "../promotion/repository";
-import { Promotion, PromotionReward } from "../promotion/types";
-import { CompaniesWithPromotions, PromotionsWithRewards } from "./types";
+import { Promotion, promotionCollection, PromotionReward } from "../promotion/types";
+import { ClientWallet, CompaniesWithPromotions, promotionClientCollection, PromotionsWithRewards } from "./types";
 import { asyncGetManyRewardsById } from "../reward/repository";
 import { Reward } from "../reward/types";
+
+const asyncGetClientWalletMemoized = new Map<string, ClientWallet>();
+export async function asyncGetClientWallet(uidCompany: string, uidPromotion: string, uidUser: string): Promise<ClientWallet> {
+    if (asyncGetClientWalletMemoized.has(`${uidCompany}-${uidPromotion}-${uidUser}`)) {
+        return asyncGetClientWalletMemoized.get(`${uidCompany}-${uidPromotion}-${uidUser}`)!;
+    }
+    
+    const collectionRef = db.collection(db.store, "usuarios", uidCompany, promotionCollection, uidPromotion, promotionClientCollection);
+    const query = db.query(collectionRef, db.where("uidClient", "==", uidUser));
+    let wallet = (await db.getDocs(query)).docs.map(doc => doc.data() as ClientWallet)[0];
+
+    if (!wallet) {
+        wallet = {
+            uid: "",
+            uidClient: uidUser,
+            uidPromotion: uidPromotion,
+            coins: 0
+        }
+
+        const docRef = await db.addDoc(collectionRef, wallet);
+        await db.setDoc(docRef, { uid: docRef.id }, { merge: true });
+
+        wallet.uid = docRef.id;
+    }
+
+    asyncGetClientWalletMemoized.set(`${uidCompany}-${uidPromotion}-${uidUser}`, wallet);
+    
+    return wallet;
+}
 
 export async function asyncGetAllCompaniesForClient(): Promise<CompaniesWithPromotions[]> {
     const collectionRef = db.collection(db.store, "usuarios");
@@ -38,10 +67,11 @@ export async function asyncGetAllCompaniesForClient(): Promise<CompaniesWithProm
         allRewardIds.set(reward.uid!, reward);
     });
 
-    let allCompaniesWithPromotionsWithRewards = allCompaniesWithPromotions.map(company => {
-        const promotionsWithRewards: PromotionsWithRewards[] = company.promotions?.map(promotion => {
+    let allCompaniesWithPromotionsWithRewards = await Promise.all(allCompaniesWithPromotions.map(async company => {
+        const promotionsWithRewards: PromotionsWithRewards[] = await Promise.all(company.promotions?.map(async promotion => {
             return {
                 ...promotion,
+                wallet: await asyncGetClientWallet(company.uid!, promotion.uid!, db.auth.currentUser!.uid),
                 rewards: promotion.rewards.map(promotionReward => {
                     return {
                         ...promotionReward,
@@ -49,7 +79,7 @@ export async function asyncGetAllCompaniesForClient(): Promise<CompaniesWithProm
                     }
                 })
             }
-        })!;
+        })!);
 
         delete company.promotions;
         delete company.deleted;
@@ -60,7 +90,7 @@ export async function asyncGetAllCompaniesForClient(): Promise<CompaniesWithProm
         };
 
         return result;
-    })
+    }))
 
     allCompaniesWithPromotionsWithRewards = allCompaniesWithPromotionsWithRewards.filter(company => company.promotions?.length! > 0);
 
