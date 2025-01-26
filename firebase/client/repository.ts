@@ -38,7 +38,7 @@ export async function asyncGetAllCompaniesForClient(): Promise<CompaniesWithProm
         allRewardIds.set(reward.uid!, reward);
     });
 
-    const allCompaniesWithPromotionsWithRewards = allCompaniesWithPromotions.map(company => {
+    let allCompaniesWithPromotionsWithRewards = allCompaniesWithPromotions.map(company => {
         const promotionsWithRewards: PromotionsWithRewards[] = company.promotions?.map(promotion => {
             return {
                 ...promotion,
@@ -61,6 +61,8 @@ export async function asyncGetAllCompaniesForClient(): Promise<CompaniesWithProm
 
         return result;
     })
+
+    allCompaniesWithPromotionsWithRewards = allCompaniesWithPromotionsWithRewards.filter(company => company.promotions?.length! > 0);
 
     return allCompaniesWithPromotionsWithRewards;
 }
