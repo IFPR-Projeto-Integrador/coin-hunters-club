@@ -11,8 +11,14 @@ export async function asyncGetUserRewards(client: CHCUser): Promise<Reward[]> {
     return allRewards.docs.map(doc => doc.data() as Reward);
 }
 
-export async function asyncGetRewardById(rewardId: string, client: CHCUser): Promise<Reward | null> {
-    const docRef = db.doc(db.store, "usuarios", client.uid, rewardCollection, rewardId);
+export async function asyncGetRewardById(rewardId: string, client: CHCUser | string): Promise<Reward | null> {
+    let id;
+    if (typeof client == "object")
+        id = client.uid;
+    else
+        id = client;
+
+    const docRef = db.doc(db.store, "usuarios", id, rewardCollection, rewardId);
 
     const reward = (await db.getDoc(docRef)).data() as Reward;
 

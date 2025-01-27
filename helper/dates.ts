@@ -16,4 +16,12 @@ export function stringToDate(date: DateStringDDMMYYYY): Date {
 export function isDateStringDDMMYYYY(input: string): input is DateStringDDMMYYYY {
     const regex = /^\d+\/\d+\/\d+$/;
     return regex.test(input);
-  }
+}
+
+export function isOneHourInThePast(date1: Date, date2: Date): boolean {
+    return date2.getTime() - date1.getTime() > 3600000;
+}
+
+export function isOneMinuteInThePast(date1: Date, date2: Date): boolean {
+    return date2.getTime() - date1.getTime() > 60000;
+}

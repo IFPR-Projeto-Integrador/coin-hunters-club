@@ -1,5 +1,5 @@
 import { CHCUser } from "../user/user";
-import { Promotion, promotionCollection, PromotionError } from "./types";
+import { Promotion, promotionCollection, PromotionError, PromotionReward } from "./types";
 import db from "@/firebase/config";
 import { isValidPromotion, promotionRunning, validatePromotion } from "./validation";
 
@@ -16,6 +16,70 @@ export async function asyncGetUserPromotions(user: CHCUser, options?: AsyncGetUs
     }
     
     return promotions;
+}
+
+export async function asyncGetPromotionReward(user: CHCUser | string, promotion: Promotion | string, rewardUid: string): Promise<PromotionReward | null> {
+    let idUser;
+    if (typeof user == "string") {
+        idUser = user;
+    } else {
+        idUser = user.uid;
+    }
+
+    let idPromotion;
+    if (typeof promotion == "string") {
+        idPromotion = promotion;
+    } else {
+        idPromotion = promotion.uid!;
+    }
+
+    const docRef = db.doc(db.store, "usuarios", idUser, promotionCollection, idPromotion);
+
+    const doc = await db.getDoc(docRef);
+
+    if (!doc.exists) {
+        return null;
+    }
+
+    const promotionDocument = doc.data() as Promotion;
+
+    const reward = promotionDocument.rewards.find(reward => reward.uidReward == rewardUid);
+
+    return reward ?? null;
+}
+
+export async function asyncUpdatePromotionRewardStock(user: CHCUser | string, promotion: Promotion | string, rewardUid: string, newStock: number): Promise<Promotion | PromotionError> {
+    let idUser;
+    if (typeof user == "string") {
+        idUser = user;
+    } else {
+        idUser = user.uid;
+    }
+
+    let idPromotion;
+    if (typeof promotion == "string") {
+        idPromotion = promotion;
+    } else {
+        idPromotion = promotion.uid!;
+    }
+
+    const docRef = db.doc(db.store, "usuarios", idUser, promotionCollection, idPromotion ?? "");
+
+    const docPromotion = (await db.getDoc(docRef)).data() as Promotion | undefined;
+
+    if (docPromotion == undefined)
+        return PromotionError.PromotionDoesNotExist;
+
+    const reward = docPromotion.rewards.find(reward => reward.uidReward == rewardUid);
+
+    if (reward == undefined)
+        return PromotionError.RewardCannotBeNull;
+
+    reward.stock = newStock;
+
+    await db.setDoc(docRef, docPromotion);
+
+    return docPromotion;
 }
 
 export async function asyncGetPromotion(user: CHCUser, uid: string): Promise<Promotion | null> {
@@ -40,7 +104,6 @@ export async function asyncCreatePromotion(promotion: Promotion, client: CHCUser
         return [PromotionError.PromotionAlreadyExists];
     }
 
-    // Checks if there is already a promotion within the same period
     const allPromotions = await asyncGetUserPromotions(client);
     const overlappingPromotion = allPromotions.find(existingPromotion => 
         promotion.dtStart <= existingPromotion.dtEnd && promotion.dtEnd >= existingPromotion.dtStart);

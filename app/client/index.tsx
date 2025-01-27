@@ -6,15 +6,16 @@ import IconButton from "@/components/ui/IconButton";
 import Loading from "@/components/ui/Loading";
 import { Colors } from "@/constants/Colors";
 import { useAuth } from "@/context/authContext";
-import { asyncGetAllCompaniesForClient } from "@/firebase/client/repository";
-import { CompaniesWithPromotions, PromotionsWithRewards } from "@/firebase/client/types";
-import { PromotionReward } from "@/firebase/promotion/types";
+import { asyncGetAllCompaniesForClient, asyncReserveReward } from "@/firebase/client/repository";
+import { CompaniesWithPromotions, promotionClientErrorToUser, PromotionsWithRewards } from "@/firebase/client/types";
+import { promotionErrorToUser, PromotionReward } from "@/firebase/promotion/types";
 import { Reward } from "@/firebase/reward/types";
 import { dateToString } from "@/helper/dates";
 import headerConfig from "@/helper/headerConfig";
 import { useEffect, useState } from "react";
 import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native"
 import Icon from "@expo/vector-icons/FontAwesome";
+import { confirmPopup } from "@/helper/popups";
 
 
 
@@ -24,12 +25,13 @@ export default function IndexClient() {
 
     const [promotions, setPromotions] = useState<CompaniesWithPromotions[] | null>(null);
     const [selectedQuantity, setSelectedQuantity] = useState<Record<string, number>>({})
+    const [reload, setReload] = useState(0);
 
     useEffect(() => {
         if (user) {
             asyncGetAllCompaniesForClient().then(setPromotions).catch(console.error);
         };
-    }, [user]);
+    }, [user, reload]);
 
 
     if (loading)
@@ -56,13 +58,25 @@ export default function IndexClient() {
         return selectedQuantity[promotionId + rewardId];
     }
 
-    function openLeaderboard() {
+    async function openLeaderboard() {
         console.log("Clicked leaderboard")
     }
 
-    function reserveReward(reward: (PromotionReward & { reward: Reward })) {
-        console.log("Clicked reserve reward")
+    async function reserveReward(uidCompany: string, uidPromotion: string, uidReward: string, amount: number, isAlreadyReserved: boolean) {
+        if (isAlreadyReserved) {
+            confirmPopup("Erro", "Você já reservou essa recompensa.");
+            return;
+        }
+        const result = await asyncReserveReward(uidCompany, uidPromotion, user?.uid!, uidReward, amount)
 
+        console.log(result);
+
+        if (typeof result == "number") {
+            confirmPopup("Erro", promotionClientErrorToUser(result));
+        }
+        else {
+            setReload(reload + 1);
+        }
     }
 
 
@@ -119,11 +133,22 @@ export default function IndexClient() {
                                                     <Text>Estoque</Text>
                                                     <Text style={styles.rewardInfoText}>{reward.stock}</Text>
                                                 </View>
-                                                <TouchableOpacity style={styles.reserveButton} onPress={() => reserveReward(reward)}>
+                                                <TouchableOpacity style={styles.reserveButton} 
+                                                    onPress={() => reserveReward(company.company.uid, 
+                                                        promotion.uid!, 
+                                                        reward.uidReward, 
+                                                        getQuantity(promotion.uid!, reward.uidReward),
+                                                        reward.reservation != null)}>
                                                     <Text>Reservar</Text>
                                                 </TouchableOpacity>
                                             </View>
                                         </View>
+                                        { reward.reservation && (
+                                            <View style={styles.reservationInfoRow}>
+                                                <Text style={styles.reservationLabel}>Código da Reserva</Text>
+                                                <Text style={styles.reservationCode}>{reward.reservation.reservationCode}</Text>
+                                            </View>
+                                        )}
                                         <Text style={styles.rewardDescription}>
                                             {reward.reward.description}
                                         </Text>
@@ -197,7 +222,6 @@ const styles = StyleSheet.create({
     },
     rewardInfoContainer: {
         flex: 8,
-        
     },
     rewardInfoRow: {
         flexDirection: "row",
@@ -250,5 +274,21 @@ const styles = StyleSheet.create({
         margin: 10,
         marginLeft: 7,
     },
+    reservationInfoRow: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+        alignItems: "center",
+        marginTop: 5,
+    },
+    reservationLabel: {
+        flex: 5,
+        textAlign: "center",
+    },
+    reservationCode: {
+        flex: 8,
+        backgroundColor: Colors.primaryLighter,
+        width: "100%",
+        textAlign: "center",
+    }
     
 });
