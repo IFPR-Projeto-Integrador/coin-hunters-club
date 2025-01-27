@@ -85,10 +85,12 @@ export async function asyncExpireReservation(uidCompany: string, uidPromotion: s
     await asyncUpdatePromotionRewardStock(uidCompany, uidPromotion, reward.uidReward!, reward.stock + reservation.amountReserved);
 }
 
-export async function asyncGetTotalBoughtRewards(uidCompany: string, uidPromotion: string, uidUser: string, uidReward: string): Promise<number> {
+export async function asyncGetTotalBoughtRewards(uidCompany: string, uidPromotion: string, uidClientWallet: string, uidReward: string): Promise<number> {
+    debugger;
+    console.log("Teste")
     const collectionRef = db.collection(db.store, "usuarios", uidCompany, promotionCollection, uidPromotion, reservationCollection);
     const query = db.query(collectionRef, 
-            db.where("uidClientWallet", "==", uidUser), 
+            db.where("uidClientWallet", "==", uidClientWallet), 
             db.where("uidReward", "==", uidReward),
             db.where("state", "!=", RewardReservationState.expired));
 
@@ -119,6 +121,9 @@ export async function asyncGetReservationByCode(uidCompany: string, uidPromotion
 
 export async function asyncReserveReward(uidCompany: string, uidPromotion: string, uidUser: string, uidReward: string, amount: number)
     : Promise<PromotionClientError | RewardReservation> {
+    
+    debugger;
+    console.log("Teste");
     const wallet = await asyncGetClientWallet(uidCompany, uidPromotion, uidUser);
     const reward = await asyncGetPromotionReward(uidCompany, uidPromotion, uidReward);
     
@@ -146,7 +151,7 @@ export async function asyncReserveReward(uidCompany: string, uidPromotion: strin
         return PromotionClientError.cannotReserveMoreThanLimitPerUser;
     }
 
-    const totalBought = await asyncGetTotalBoughtRewards(uidCompany, uidPromotion, uidUser, uidReward);
+    const totalBought = await asyncGetTotalBoughtRewards(uidCompany, uidPromotion, wallet.uid, uidReward);
 
     if (totalBought + amount > reward.limitPerUser) {
         return PromotionClientError.cannotReserveMoreThanLimitPerUser;
