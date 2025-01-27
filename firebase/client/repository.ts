@@ -80,14 +80,12 @@ export async function asyncExpireReservation(uidCompany: string, uidPromotion: s
     const reservationDoc = (await db.getDocs(query)).docs[0];
     const reservation = reservationDoc.data() as RewardReservation;
 
-    await db.setDoc(reservationDoc.ref, { state: RewardReservationState.expired }, { merge: true });
+    await db.setDoc(reservationDoc.ref, { state: RewardReservationState.expired, reservationCode: null }, { merge: true });
     await asyncUpdateWallet(uidCompany, uidPromotion, wallet.uidClient, wallet.coins + (reward.unitPrice * reservation.amountReserved));
     await asyncUpdatePromotionRewardStock(uidCompany, uidPromotion, reward.uidReward!, reward.stock + reservation.amountReserved);
 }
 
 export async function asyncGetTotalBoughtRewards(uidCompany: string, uidPromotion: string, uidClientWallet: string, uidReward: string): Promise<number> {
-    debugger;
-    console.log("Teste")
     const collectionRef = db.collection(db.store, "usuarios", uidCompany, promotionCollection, uidPromotion, reservationCollection);
     const query = db.query(collectionRef, 
             db.where("uidClientWallet", "==", uidClientWallet), 
@@ -121,9 +119,6 @@ export async function asyncGetReservationByCode(uidCompany: string, uidPromotion
 
 export async function asyncReserveReward(uidCompany: string, uidPromotion: string, uidUser: string, uidReward: string, amount: number)
     : Promise<PromotionClientError | RewardReservation> {
-    
-    debugger;
-    console.log("Teste");
     const wallet = await asyncGetClientWallet(uidCompany, uidPromotion, uidUser);
     const reward = await asyncGetPromotionReward(uidCompany, uidPromotion, uidReward);
     
