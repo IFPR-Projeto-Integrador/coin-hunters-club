@@ -37,8 +37,16 @@ export interface RewardReservation {
     state: RewardReservationState;
 }
 
+export interface RewardRedeem {
+    uid: string;
+    uidEmployee: string;
+    uidRewardReservation: string;
+    dtRedeem: Timestamp;
+}
+
 export enum PromotionClientError {
-    notEnoughCoins, rewardNotFound, notEnoughStock, cannotReserveZero, cannotReserveMoreThan99, cannotReserveMoreThanLimitPerUser
+    notEnoughCoins, rewardNotFound, notEnoughStock, cannotReserveZero, cannotReserveMoreThan99, cannotReserveMoreThanLimitPerUser,
+    reservationNotFound, alreadyRedeemed, alreadyExpired
 }
 
 export function promotionClientErrorToUser(error: PromotionClientError): string {
@@ -55,9 +63,17 @@ export function promotionClientErrorToUser(error: PromotionClientError): string 
             return "Não é possível reservar mais de 99 recompensas";
         case PromotionClientError.cannotReserveMoreThanLimitPerUser:
             return "Limite por usuário atingido";
+        case PromotionClientError.reservationNotFound:
+            return "Reserva não encontrada";
+        case PromotionClientError.alreadyRedeemed:
+            return "Reserva já resgatada";
+        case PromotionClientError.alreadyExpired:
+            return "Reserva expirada";
     }
 }
 
 export const promotionClientCollection = "promotion-client";
 
 export const reservationCollection = "reservations";
+
+export const redeemCollection = "redeems";

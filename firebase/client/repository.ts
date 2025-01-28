@@ -2,7 +2,7 @@ import db from "@/firebase/config";
 import { CHCUser } from "../user/user";
 import { asyncGetPromotionReward, asyncGetUserPromotions, asyncUpdatePromotionRewardStock } from "../promotion/repository";
 import { Promotion, promotionCollection, PromotionReward } from "../promotion/types";
-import { ClientWallet, CompaniesWithPromotions, promotionClientCollection, PromotionClientError, PromotionsWithRewards, reservationCollection, RewardReservation, RewardReservationState } from "./types";
+import { ClientWallet, CompaniesWithPromotions, promotionClientCollection, PromotionClientError, PromotionsWithRewards, redeemCollection, reservationCollection, RewardRedeem, RewardReservation, RewardReservationState } from "./types";
 import { asyncGetManyRewardsById, asyncGetRewardById } from "../reward/repository";
 import { Reward } from "../reward/types";
 import { genReservationCode } from "@/helper/codes";
@@ -117,6 +117,48 @@ export async function asyncGetReservationByCode(uidCompany: string, uidPromotion
 
 }
 
+export async function asyncGetRewardByReservationCode(uidCompany: string, code: string): Promise<Reward & { uidPromotion: string } | null> {
+    const collectionRef = db.collection(db.store, "usuarios", uidCompany, promotionCollection);
+    const promotions = await db.getDocs(collectionRef);
+
+    const reservations = [] as RewardReservation[];
+
+    for (const promotionDoc of promotions.docs) {
+        const promotionId = promotionDoc.id;
+        const reservationCollectionRef = db.collection(db.store, "usuarios", uidCompany, promotionCollection, promotionId, reservationCollection);
+        const query = db.query(reservationCollectionRef, db.where("reservationCode", "==", code));
+        const reservationDocs = await db.getDocs(query);
+
+        if (reservationDocs.docs.length > 1) {
+            throw new Error("There was more than one reservation with the same code");
+        }
+
+        if (reservationDocs.docs.length === 1) {
+            reservations.push(reservationDocs.docs[0].data() as RewardReservation);
+        }
+    }
+
+    if (reservations.length > 1) {
+        throw new Error("There was more than one reservation with the same code");
+    }
+
+    if (reservations.length === 0) {
+        return null;
+    }
+
+    const reservation = reservations[0];
+
+    if (reservation.state !== RewardReservationState.reserved || isOneHourInThePast(reservation.dtReservation.toDate(), new Date(Date.now()))) {
+        return null;
+    }
+
+    const reward = await asyncGetRewardById(reservation.uidReward, uidCompany);
+
+    if (!reward) return null;
+
+    return { ...reward, uidPromotion: reservation.uidPromotion };
+}
+
 export async function asyncReserveReward(uidCompany: string, uidPromotion: string, uidUser: string, uidReward: string, amount: number)
     : Promise<PromotionClientError | RewardReservation> {
     const wallet = await asyncGetClientWallet(uidCompany, uidPromotion, uidUser);
@@ -175,6 +217,49 @@ export async function asyncReserveReward(uidCompany: string, uidPromotion: strin
 
     await asyncUpdateWallet(uidCompany, uidPromotion, uidUser, wallet.coins - (reward.unitPrice * amount));
     await asyncUpdatePromotionRewardStock(uidCompany, uidPromotion, uidReward, reward.stock - amount);
+
+    return reservation;
+}
+
+export async function asyncRedeemReward(uidCompany: string, uidPromotion: string, uidUser: string, code: string): Promise<PromotionClientError | RewardReservation> {
+    const reservationCollectionRef = db.collection(db.store, "usuarios", uidCompany, promotionCollection, uidPromotion, reservationCollection);
+    const redeemCollectionRef = db.collection(db.store, "usuarios", uidCompany, promotionCollection, uidPromotion, redeemCollection);
+    const query = db.query(reservationCollectionRef, db.where("reservationCode", "==", code));
+    const reservationDoc = (await db.getDocs(query)).docs[0];
+    const reservation = reservationDoc.data() as RewardReservation;
+
+    if (!reservation) {
+        return PromotionClientError.reservationNotFound;
+    }
+
+    if (reservation.state === RewardReservationState.redeemed) {
+        return PromotionClientError.alreadyRedeemed;
+    }
+
+    if (reservation.state === RewardReservationState.expired) {
+        return PromotionClientError.alreadyExpired;
+    }
+
+    if (isOneHourInThePast(reservation.dtReservation.toDate(), new Date(Date.now()))) {
+        return PromotionClientError.alreadyExpired;
+    }
+
+    const reward = await asyncGetPromotionReward(uidCompany, uidPromotion, reservation.uidReward);
+
+    if (!reward) {
+        return PromotionClientError.rewardNotFound;
+    }
+
+    const redeem: RewardRedeem = {
+        uid: "",
+        uidEmployee: uidUser,
+        uidRewardReservation: reservation.uid,
+        dtRedeem: Timestamp.fromDate(new Date(Date.now()))
+    }
+
+    await db.setDoc(reservationDoc.ref, { state: RewardReservationState.redeemed, reservationCode: null }, { merge: true });
+    const redeemDocRef = await db.addDoc(redeemCollectionRef, redeem);
+    await db.setDoc(redeemDocRef, { uid: redeemDocRef.id }, { merge: true });
 
     return reservation;
 }

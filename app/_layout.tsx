@@ -49,6 +49,8 @@ export default function RootLayout() {
 
         <Stack.Screen name="client/index" options={header({ title: "Promoções" })}/>
 
+        <Stack.Screen name="employee/index" options={header({title: "Funcionário"})}/>
+
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" options={{ headerShown: false }}/>
         <Stack.Screen name="soon" options={header({ title: "Em breve" })}/>
