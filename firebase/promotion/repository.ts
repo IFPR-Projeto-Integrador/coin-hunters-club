@@ -4,8 +4,15 @@ import db from "@/firebase/config";
 import { isValidPromotion, promotionRunning, validatePromotion } from "./validation";
 
 interface AsyncGetUserPromotionsOptions { onlyActiveOnes?: boolean}
-export async function asyncGetUserPromotions(user: CHCUser, options?: AsyncGetUserPromotionsOptions): Promise<Promotion[]> {
-    const collectionRef = db.collection(db.store, "usuarios", user.uid, promotionCollection);
+export async function asyncGetUserPromotions(user: CHCUser | string, options?: AsyncGetUserPromotionsOptions): Promise<Promotion[]> {
+    let idUser;
+    if (typeof user == "string") {
+        idUser = user;
+    } else {
+        idUser = user.uid;
+    }
+
+    const collectionRef = db.collection(db.store, "usuarios", idUser, promotionCollection);
 
     const allRewards = await db.getDocs(collectionRef);
 

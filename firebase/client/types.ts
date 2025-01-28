@@ -44,9 +44,21 @@ export interface RewardRedeem {
     dtRedeem: Timestamp;
 }
 
+export interface CoinCredit {
+    uid: string;
+    uidEmployee: string;
+    uidClientWallet: string;
+    dtTransaction: Timestamp;
+    amountSpent: number;
+    coinsReceived: number;
+}
+
 export enum PromotionClientError {
     notEnoughCoins, rewardNotFound, notEnoughStock, cannotReserveZero, cannotReserveMoreThan99, cannotReserveMoreThanLimitPerUser,
-    reservationNotFound, alreadyRedeemed, alreadyExpired
+    reservationNotFound, alreadyRedeemed, alreadyExpired, clientNotFound,
+    walletNotFound,
+    noActivePromotion,
+    multipleActivePromotions
 }
 
 export function promotionClientErrorToUser(error: PromotionClientError): string {
@@ -69,6 +81,14 @@ export function promotionClientErrorToUser(error: PromotionClientError): string 
             return "Reserva já resgatada";
         case PromotionClientError.alreadyExpired:
             return "Reserva expirada";
+        case PromotionClientError.clientNotFound:
+            return "Cliente não encontrado";
+        case PromotionClientError.walletNotFound:
+            return "Carteira não encontrada";
+        case PromotionClientError.noActivePromotion:
+            return "Nenhuma promoção ativa";
+        case PromotionClientError.multipleActivePromotions:
+            return "Múltiplas promoções ativas";
     }
 }
 
@@ -77,3 +97,5 @@ export const promotionClientCollection = "promotion-client";
 export const reservationCollection = "reservations";
 
 export const redeemCollection = "redeems";
+
+export const coinCreditCollection = "coin-credit";

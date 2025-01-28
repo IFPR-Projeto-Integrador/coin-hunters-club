@@ -1,24 +1,27 @@
 import { GoldButton } from "@/components/ui/GoldButton";
 import { MainView } from "@/components/layout/MainView";
 import { StdStyles } from "@/constants/Styles";
-import { router } from "expo-router";
 import { StyleSheet, View, Text, Image } from "react-native";
 import { useAuth } from "@/context/authContext";
-import { Paths } from "@/constants/Paths";
 import Root from "@/components/Root";
 import Loading from "@/components/ui/Loading";
 import headerConfig from "@/helper/headerConfig";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormInput } from "@/components/ui/FormInput";
-import { asyncGetRewardByReservationCode, asyncRedeemReward } from "@/firebase/client/repository";
-import { PromotionClientError, promotionClientErrorToUser, RewardReservation } from "@/firebase/client/types";
+import { asyncCreditCoins, asyncGetRewardByReservationCode, asyncRedeemReward } from "@/firebase/client/repository";
+import { promotionClientErrorToUser } from "@/firebase/client/types";
 import { Reward } from "@/firebase/reward/types";
+import { useCameraPermissions, CameraView, CameraType } from "expo-camera"
+import { confirmPopup } from "@/helper/popups";
 
 export default function IndexEmployee() {
     const [user, loading] = useAuth();
     const [clientLogin, setClientLogin] = useState("");
     const [reservationCode, setReservationCode] = useState("");
     const [reward, setReward] = useState<Reward & { uidPromotion: string } | null>(null);
+    const [errors, setErrors] = useState<string[]>([]);
+    const [permission, requestPermission] = useCameraPermissions();
+    const [qrCodeValue, setQrCodeValue] = useState<string | null>(null);
 
     headerConfig({ title: user?.nome ?? "Funcionário", show: true });
 
@@ -28,8 +31,28 @@ export default function IndexEmployee() {
     if (!user)
         return <Loading />
 
-    async function creditCoins() {
+    if (!permission)
+        return <Loading />
 
+    async function creditCoins() {
+        if (!qrCodeValue) {
+            alert("QR code não detectado")
+            return
+        }
+
+        const result = await confirmPopup("Creditar moedas", `Deseja creditar moedas para o cliente ${clientLogin}?`);
+
+        if (!result) return;
+
+        const value: { value: number } = JSON.parse(qrCodeValue);
+
+        const transactionResult = await asyncCreditCoins(user?.uidEmpresa!, value.value, clientLogin);
+
+        if (typeof transactionResult === "number") {
+            setErrors([promotionClientErrorToUser(transactionResult)]);
+        }
+
+        alert("Coins creditados com sucesso!");
     }
 
     async function redeemReward() {
@@ -69,10 +92,20 @@ export default function IndexEmployee() {
     return (
         <Root requireAuth>
             <MainView>
+                { errors.map((error, index) => <Text key={index}>{error}</Text>) }
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
-                    <FormInput setValue={setClientLogin} value={clientLogin} label="Login do Cliente"/>
-                    <GoldButton title="Creditar" onPress={creditCoins} style={[styles.button]}/>
-                    <FormInput setValue={setAndShowReward} value={reservationCode} label="Código da Reserva"/>
+                    <FormInput setValue={setClientLogin} value={clientLogin} label="Login do Cliente" placeholder="Login"/>
+                    <CameraView style={styles.camera} facing={"front"}
+                        onBarcodeScanned={(value) => setQrCodeValue(value.data)}
+                        barcodeScannerSettings={{
+                            barcodeTypes: ["qr"],
+                        }}>
+                    </CameraView>
+                    <Text>QR code detectado: {qrCodeValue}</Text>
+                    <GoldButton title={permission.granted ? "Creditar" : "Conceder permissão a câmera"} 
+                        onPress={permission.granted ? creditCoins : requestPermission} 
+                        style={[styles.button]}/>
+                    <FormInput setValue={setAndShowReward} value={reservationCode} label="Código da Reserva" placeholder="Código"/>
                     <View style={styles.imageContainer}>
                         <Text>{reward?.name}</Text>
                         <Image source={{ uri: reward?.imageBase64 }} style={styles.image}/>
@@ -100,4 +133,9 @@ const styles = StyleSheet.create({
         width: 150,
         height: 150,
     },
+    camera: {
+        flex: 1,
+        width: 150,
+        height: 150,
+    }
 })

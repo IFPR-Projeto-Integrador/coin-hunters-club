@@ -1,13 +1,13 @@
 import db from "@/firebase/config";
-import { CHCUser } from "../user/user";
+import { asyncGetUserByLoggin as asyncGetUserByLogin, CHCUser } from "../user/user";
 import { asyncGetPromotionReward, asyncGetUserPromotions, asyncUpdatePromotionRewardStock } from "../promotion/repository";
 import { Promotion, promotionCollection, PromotionReward } from "../promotion/types";
-import { ClientWallet, CompaniesWithPromotions, promotionClientCollection, PromotionClientError, PromotionsWithRewards, redeemCollection, reservationCollection, RewardRedeem, RewardReservation, RewardReservationState } from "./types";
+import { ClientWallet, CoinCredit, coinCreditCollection, CompaniesWithPromotions, promotionClientCollection, PromotionClientError, PromotionsWithRewards, redeemCollection, reservationCollection, RewardRedeem, RewardReservation, RewardReservationState } from "./types";
 import { asyncGetManyRewardsById, asyncGetRewardById } from "../reward/repository";
 import { Reward } from "../reward/types";
 import { genReservationCode } from "@/helper/codes";
 import { Timestamp } from "firebase/firestore";
-import { isOneHourInThePast, isOneMinuteInThePast } from "@/helper/dates";
+import { isOneHourInThePast } from "@/helper/dates";
 
 const asyncGetClientWalletMemoized = new Map<string, ClientWallet>();
 export async function asyncGetClientWallet(uidCompany: string, uidPromotion: string, uidUser: string): Promise<ClientWallet> {
@@ -36,6 +36,21 @@ export async function asyncGetClientWallet(uidCompany: string, uidPromotion: str
     asyncGetClientWalletMemoized.set(`${uidCompany}-${uidPromotion}-${uidUser}`, wallet);
     
     return wallet;
+}
+
+export async function asyncGetClientWalletByLogin(uidCompany: string, uidPromotion: string, login: CHCUser | string): Promise<ClientWallet | null> {
+    let user;
+    
+    if (typeof login === "string") {
+        user = await asyncGetUserByLogin(login);
+
+        if (!user) return null;
+    }
+    else {
+        user = login;
+    }
+
+    return await asyncGetClientWallet(uidCompany, uidPromotion, user.uid!);
 }
 
 export async function asyncGetReservationForReward(uidCompany: string, uidPromotion: string, uidUser: string, uidReward: string): Promise<RewardReservation | null> {
@@ -262,6 +277,49 @@ export async function asyncRedeemReward(uidCompany: string, uidPromotion: string
     await db.setDoc(redeemDocRef, { uid: redeemDocRef.id }, { merge: true });
 
     return reservation;
+}
+
+export async function asyncCreditCoins(uidCompany: string, value: number, userLogin: string): Promise<PromotionClientError | undefined> {
+    const client = await asyncGetUserByLogin(userLogin);
+
+    if (!client) {
+        return PromotionClientError.clientNotFound
+    }
+
+    const activePromotions = await asyncGetUserPromotions(uidCompany, { onlyActiveOnes: true });
+
+    if (activePromotions.length === 0) {
+        return PromotionClientError.noActivePromotion;
+    }
+    if (activePromotions.length > 1) {
+        return PromotionClientError.multipleActivePromotions;
+    }
+
+    const activePromotion = activePromotions[0];
+    const uidPromotion = activePromotion.uid!;
+
+    const wallet = await asyncGetClientWalletByLogin(uidCompany, uidPromotion, client);
+
+    if (!wallet) {
+        return PromotionClientError.walletNotFound;
+    }
+
+    const transaction: CoinCredit = {
+        uid: "",
+        uidClientWallet: "",
+        uidEmployee: db.auth.currentUser!.uid,
+        dtTransaction: Timestamp.fromDate(new Date(Date.now())),
+        amountSpent: value,
+        coinsReceived: (Math.floor(value/activePromotion.conversion)*1000)
+    };
+
+    transaction.uidClientWallet = wallet.uid;
+
+    const collectionRef = db.collection(db.store, "usuarios", uidCompany, promotionCollection, uidPromotion, coinCreditCollection);
+    const docRef = await db.addDoc(collectionRef, transaction);
+    await db.setDoc(docRef, { uid: docRef.id }, { merge: true });
+
+    await asyncUpdateWallet(uidCompany, uidPromotion, wallet.uidClient, wallet.coins + transaction.coinsReceived);
 }
 
 export async function asyncGetAllCompaniesForClient(): Promise<CompaniesWithPromotions[]> {

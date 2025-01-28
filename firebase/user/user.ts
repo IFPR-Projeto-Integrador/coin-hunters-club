@@ -60,6 +60,17 @@ export async function asyncGetUser(id: string): Promise<CHCUser | null> {
     })[0];
 }
 
+export async function asyncGetUserByLoggin(login: string): Promise<CHCUser | null> {
+    const usuariosCollection = db.collection(db.store, "usuarios");
+    const usuarioQuery = db.query(usuariosCollection, db.where("login", "==", login), db.where("deleted", "==", false));
+    const usuario = await db.getDocs(usuarioQuery);
+
+    return usuario.docs.map((doc) => {
+        const data = doc.data();
+        return { ...data, uid: doc.id } as CHCUser
+    })[0];
+}
+
 export async function asyncGetAllUsers() {
     const usuariosCollection = db.collection(db.store, "usuarios");
     const usuariosQuery = db.query(usuariosCollection, db.where("deleted", "==", false));

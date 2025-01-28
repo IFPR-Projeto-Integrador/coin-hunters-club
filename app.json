@@ -32,6 +32,12 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Permitir com que Coin Hunters Club tenha acesso a sua câmera"
+        }
       ]
     ],
     "experiments": {
