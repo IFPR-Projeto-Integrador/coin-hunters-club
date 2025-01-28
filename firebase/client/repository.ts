@@ -53,7 +53,7 @@ export async function asyncGetReservationForReward(uidCompany: string, uidPromot
 
     const reservation = reservationDoc.docs[0].data() as RewardReservation;
 
-    if (isOneMinuteInThePast(reservation.dtReservation.toDate(), new Date(Date.now())) && reservation.state === RewardReservationState.reserved) {
+    if (isOneHourInThePast(reservation.dtReservation.toDate(), new Date(Date.now())) && reservation.state === RewardReservationState.reserved) {
         const reward = await asyncGetPromotionReward(uidCompany, uidPromotion, uidReward);
 
         if (!reward) {
