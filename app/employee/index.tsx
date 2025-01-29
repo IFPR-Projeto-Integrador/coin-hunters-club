@@ -95,12 +95,14 @@ export default function IndexEmployee() {
                 { errors.map((error, index) => <Text key={index}>{error}</Text>) }
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
                     <FormInput setValue={setClientLogin} value={clientLogin} label="Login do Cliente" placeholder="Login"/>
-                    <CameraView style={styles.camera} facing={"front"}
-                        onBarcodeScanned={(value) => setQrCodeValue(value.data)}
-                        barcodeScannerSettings={{
-                            barcodeTypes: ["qr"],
-                        }}>
-                    </CameraView>
+                    <View style={styles.cameraContainer}>
+                        <CameraView style={styles.camera} facing={"front"}
+                            onBarcodeScanned={(value) => setQrCodeValue(value.data)}
+                            barcodeScannerSettings={{
+                                barcodeTypes: ["qr"],
+                            }}>
+                        </CameraView>
+                    </View>
                     <Text>QR code detectado: {qrCodeValue}</Text>
                     <GoldButton title={permission.granted ? "Creditar" : "Conceder permissão a câmera"} 
                         onPress={permission.granted ? creditCoins : requestPermission} 
@@ -137,5 +139,10 @@ const styles = StyleSheet.create({
         flex: 1,
         width: 150,
         height: 150,
-    }
+    },
+    cameraContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
 })

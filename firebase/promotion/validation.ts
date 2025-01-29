@@ -36,8 +36,9 @@ export function validPromotionDate(promotionDtInicio: Timestamp, promotionDtFim:
     const errors: PromotionError[] = [];
 
     const now = new Date();
+    now.setHours(0, 0, 0, 0);
 
-    if (promotionDtInicio.toDate() < now || promotionDtFim.toDate() < now) {
+    if (roundToNearestDay(promotionDtInicio.toDate()) < now || roundToNearestDay(promotionDtFim.toDate()) < now) {
         errors.push(PromotionError.PromotionCannotBeInThePast);
     }
 

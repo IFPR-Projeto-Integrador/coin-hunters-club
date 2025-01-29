@@ -16,12 +16,14 @@ import { useEffect, useState } from "react";
 import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native"
 import Icon from "@expo/vector-icons/FontAwesome";
 import { confirmPopup } from "@/helper/popups";
+import { useIsFocused } from "@react-navigation/native";
 
 
 
 export default function IndexClient() {
     headerConfig({ title: "Promoções" })
     const [user, loading] = useAuth();
+    const isFocused = useIsFocused();
 
     const [promotions, setPromotions] = useState<CompaniesWithPromotions[] | null>(null);
     const [selectedQuantity, setSelectedQuantity] = useState<Record<string, number>>({})
@@ -31,7 +33,7 @@ export default function IndexClient() {
         if (user) {
             asyncGetAllCompaniesForClient().then(setPromotions).catch(console.error);
         };
-    }, [user, reload]);
+    }, [user, reload, isFocused]);
 
 
     if (loading)
@@ -39,6 +41,10 @@ export default function IndexClient() {
 
     if (!user)
         return <Loading />
+
+    function onReload() {
+        setReload(reload + 1);
+    }
 
     function updateQuantity(promotionId: string, rewardId: string, delta: number) {
         setSelectedQuantity((prev) => ({
@@ -156,6 +162,7 @@ export default function IndexClient() {
                     </Collapsible>   
                 )) }
             </MainView>
+            { !loading && <IconButton icon="refresh" size={28} onPress={onReload} style={styles.floatingButton} /> }
         </Root>
     )
 }
@@ -286,6 +293,13 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.primaryLighter,
         width: "100%",
         textAlign: "center",
-    }
+    },
+    floatingButton: {
+        position: "absolute",
+        bottom: 10,
+        right: 10,
+        backgroundColor: Colors.primaryDarker,
+        borderRadius: 10,
+    },
     
 });

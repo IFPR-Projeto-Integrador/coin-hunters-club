@@ -5,3 +5,4 @@
 
 - Erro ao terminar de cadastrar um funcionário (Function where() called with invalid data. Unsupported field value: undefined)
 - Código de reserva LE52QZB6E1 não encontrado
+- Tela de carregamento ao clicar em GoldButtons

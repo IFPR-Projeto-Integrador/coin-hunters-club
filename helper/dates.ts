@@ -27,7 +27,6 @@ export function isOneMinuteInThePast(date1: Date, date2: Date): boolean {
 }
 
 export function roundToNearestDay(date: Date) {
-    const msPerDay = 24 * 60 * 60 * 1000; // Milliseconds in a day
-    const roundedTime = Math.round(date.getTime() / msPerDay) * msPerDay;
-    return new Date(roundedTime);
+    date.setHours(0, 0, 0, 0);
+    return new Date(date);
   };

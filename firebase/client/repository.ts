@@ -9,12 +9,7 @@ import { genReservationCode } from "@/helper/codes";
 import { Timestamp } from "firebase/firestore";
 import { isOneHourInThePast } from "@/helper/dates";
 
-const asyncGetClientWalletMemoized = new Map<string, ClientWallet>();
 export async function asyncGetClientWallet(uidCompany: string, uidPromotion: string, uidUser: string): Promise<ClientWallet> {
-    if (asyncGetClientWalletMemoized.has(`${uidCompany}-${uidPromotion}-${uidUser}`)) {
-        return asyncGetClientWalletMemoized.get(`${uidCompany}-${uidPromotion}-${uidUser}`)!;
-    }
-
     const collectionRef = db.collection(db.store, "usuarios", uidCompany, promotionCollection, uidPromotion, promotionClientCollection);
     const query = db.query(collectionRef, db.where("uidClient", "==", uidUser));
     let wallet = (await db.getDocs(query)).docs.map(doc => doc.data() as ClientWallet)[0];
@@ -32,8 +27,6 @@ export async function asyncGetClientWallet(uidCompany: string, uidPromotion: str
 
         wallet.uid = docRef.id;
     }
-
-    asyncGetClientWalletMemoized.set(`${uidCompany}-${uidPromotion}-${uidUser}`, wallet);
     
     return wallet;
 }
