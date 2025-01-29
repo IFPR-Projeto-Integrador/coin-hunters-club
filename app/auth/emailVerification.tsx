@@ -29,7 +29,7 @@ export default function EmailVerification() {
 
     async function goToLogin() {
         await asyncLogout();
-        router.navigate(Paths.LOGIN);
+        router.replace(Paths.LOGIN);
     }
 
     return (

@@ -60,7 +60,7 @@ export default function CreateReward() {
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
       if (!permissionResult.granted) {
-        alert("Permission to access media library is required!");
+        alert("Permissão para acessar imagens é necessária.");
         return;
       }
 
@@ -123,7 +123,7 @@ export default function CreateReward() {
       }
     }
     
-    router.navigate(Paths.REWARD);
+    router.back();
     
   }
 

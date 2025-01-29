@@ -77,7 +77,7 @@ export default function EditPerfil() {
         }
 
         await asyncLogout();
-        router.navigate(Paths.PROFILE);
+        router.back();
     }
 
     async function deleteAccount() {
@@ -100,7 +100,7 @@ export default function EditPerfil() {
             return;
         }
 
-        router.navigate(Paths.LOGIN);
+        router.back();
     }
 
     return (

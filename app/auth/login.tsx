@@ -35,7 +35,7 @@ export default function LoginScreen() {
       return
     }
 
-    router.navigate(Paths.HOME);
+    router.replace(Paths.HOME);
   }
 
   function goToForgotPassword() {
@@ -43,7 +43,7 @@ export default function LoginScreen() {
   }
 
   function goToRegister() {
-    router.navigate(Paths.REGISTER);
+    router.replace(Paths.REGISTER);
   }
 
   return (

@@ -15,13 +15,17 @@ import IconButton from "@/components/ui/IconButton";
 import Loading from "@/components/ui/Loading";
 import { promotionEnded, promotionRunning } from "@/firebase/promotion/validation";
 import { confirmPopup } from "@/helper/popups";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function IndexPromotion() {
     const [user, loading] = useAuth();
+    const isFocused = useIsFocused();
 
     const [promotions, setPromotions] = useState([] as Promotion[]);
     const [reloadEffect, setReloadEffect] = useState(false);
     useEffect(() => {
+        if (!isFocused) return;
+        
         if (user) {
             asyncGetUserPromotions(user).then((promotions) => {
                 promotions.sort((a, b) => {
@@ -33,7 +37,7 @@ export default function IndexPromotion() {
                 setPromotions(promotions);
             }).catch(console.error);
         }
-    }, [user, reloadEffect])
+    }, [user, reloadEffect, isFocused])
 
     if (loading)
         return null;

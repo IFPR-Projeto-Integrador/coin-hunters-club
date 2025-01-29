@@ -52,7 +52,7 @@ export default function EditPromotion() {
             if (result instanceof Array) {
                 setErrors(result);
             } else {
-                router.navigate(Paths.PROMOTION);
+                router.back();
             }
         })
     }

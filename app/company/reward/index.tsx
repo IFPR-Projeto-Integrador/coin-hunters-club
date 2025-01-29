@@ -12,18 +12,19 @@ import { asyncGetUserRewards, asyncDeleteReward } from "@/firebase/reward/reposi
 import Loading from "@/components/ui/Loading";
 import { confirmPopup } from "@/helper/popups";
 import RewardCard from "@/components/ui/RewardCard";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function IndexReward() {
     const [user, loading] = useAuth();
-
-    if (loading)
-        return null;
+    const isFocused = useIsFocused();
 
     let [rewards, setRewards] = useState<Reward[]>([]);
     let [loadingRewards, setLoadingRewards] = useState(true);
     let [reloadEffect, setReloadEffect] = useState(false);
 
     useEffect(() => {
+        if (!isFocused) return;
+        
         setLoadingRewards(true);
         if (user) {
             asyncGetUserRewards(user)
@@ -33,7 +34,10 @@ export default function IndexReward() {
                 })
                 .catch(err => console.error(err));
         }
-    }, [user, reloadEffect]);
+    }, [user, reloadEffect, isFocused]);
+
+    if (loading)
+        return null;
 
     async function deleteRewardModal(reward: Reward) {
         const result = await confirmPopup("Excluir recompensa", "Deseja realmente excluir a recompensa?");

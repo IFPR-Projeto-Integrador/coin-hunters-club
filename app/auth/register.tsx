@@ -58,10 +58,10 @@ export default function Register() {
         }
 
         if (uidEmpresa) {
-            router.navigate(Paths.EMPLOYEE)
+            router.back();
         }
         else
-            router.navigate("/");
+            router.replace(Paths.HOME);
     }
 
     function validate(): string[] {

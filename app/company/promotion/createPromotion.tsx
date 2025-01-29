@@ -118,7 +118,7 @@ export default function CreatePromotion() {
       return;
     }
 
-    router.navigate(Paths.PROMOTION);
+    router.back();
   }
 
   return (

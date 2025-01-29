@@ -41,7 +41,6 @@ export default function IndexClient() {
         return <Loading />
 
     function updateQuantity(promotionId: string, rewardId: string, delta: number) {
-        console.log(promotionId, rewardId, delta);
         setSelectedQuantity((prev) => ({
             ...prev,
             [promotionId + rewardId]: Math.min(99, Math.max(0, (prev[promotionId + rewardId] || 0) + delta)),
@@ -68,8 +67,6 @@ export default function IndexClient() {
             return;
         }
         const result = await asyncReserveReward(uidCompany, uidPromotion, user?.uid!, uidReward, amount)
-
-        console.log(result);
 
         if (typeof result == "number") {
             confirmPopup("Erro", promotionClientErrorToUser(result));

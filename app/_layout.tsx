@@ -43,7 +43,6 @@ export default function RootLayout() {
         <Stack.Screen name="company/promotion/editPromotion" options={header({ title: "Nome da Promoção sendo editada" })}/>
 
         <Stack.Screen name="company/employee/index" options={header({ title: "Funcionários" })}/>
-        <Stack.Screen name="company/employee/createEmployee" options={header({ title: "Novo Funcionário" })}/>
 
         <Stack.Screen name="company/index" options={header({ title: "Empresa" })} />
 
