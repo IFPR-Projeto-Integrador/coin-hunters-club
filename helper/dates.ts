@@ -25,3 +25,9 @@ export function isOneHourInThePast(date1: Date, date2: Date): boolean {
 export function isOneMinuteInThePast(date1: Date, date2: Date): boolean {
     return date2.getTime() - date1.getTime() > 60000;
 }
+
+export function roundToNearestDay(date: Date) {
+    const msPerDay = 24 * 60 * 60 * 1000; // Milliseconds in a day
+    const roundedTime = Math.round(date.getTime() / msPerDay) * msPerDay;
+    return new Date(roundedTime);
+  };

@@ -1,3 +1,4 @@
+import { roundToNearestDay } from "@/helper/dates";
 import { Reward } from "../reward/types";
 import { Promotion, PromotionError, PromotionReward } from "./types";
 import { Timestamp } from "firebase/firestore";
@@ -94,11 +95,15 @@ export function validPromotionReward(reward: PromotionReward): PromotionError[] 
 }
 
 export function promotionEnded(promotion: Promotion): boolean {
-    return promotion.dtEnd.toMillis() < Date.now();
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    return roundToNearestDay(promotion.dtEnd.toDate()).getTime() < now.getTime();
 }
 
 export function promotionBegun(promotion: Promotion): boolean {
-    return promotion.dtStart.toMillis() <= Date.now();
+    const now = new Date();
+    now.setHours(0, 0, 0, 0)
+    return roundToNearestDay(promotion.dtStart.toDate()).getTime() <= now.getTime();
 }
 
 export function promotionRunning(promotion: Promotion): boolean {
