@@ -39,7 +39,7 @@ export default function LoginScreen() {
   }
 
   function goToForgotPassword() {
-    router.navigate(Paths.SOON);
+    router.replace(Paths.SOON);
   }
 
   function goToRegister() {

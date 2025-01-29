@@ -19,9 +19,9 @@ export const AuthProvider = ({ children }: Props) => {
                 return;
             }
             
-            asyncGetUser(currentUser.uid)
+            asyncGetUser(currentUser.uid, { ignoreDeleted: false })
                 .then(loggedUser => {
-                    if (loggedUser?.deleted) {
+                    if (loggedUser?.deleted && currentUser.emailVerified) {
                         setUser(null);
                         setLoading(false);
                         return;

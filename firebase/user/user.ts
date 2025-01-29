@@ -30,7 +30,8 @@ export interface RegisterInformation {
 export enum AuthError {
     INVALID_EMAIL = "auth/invalid-email", USER_NOT_FOUND = "auth/user-not-found", EMAIL_EXISTS = "auth/email-already-exists",
     INVALID_PASSWORD = "auth/invalid-password", INVALID_CREDENTIAL = "auth/invalid-credential", WEAK_PASSWORD = "auth/weak-password", 
-    WRONG_PASSWORD = "auth/wrong-password", UNKNOWN = "unknown"
+    WRONG_PASSWORD = "auth/wrong-password", REPEATED_EMAIL = "repetaedEmail", REPEATED_LOGIN = "repeatedLogin", 
+    WRONG_COMPANY_PASSWORD = "senhaEmpresaIncorreta", UNKNOWN = "unknown"
 }
 
 export async function asyncGetLoggedUser(): Promise<CHCUser | null> {
@@ -48,10 +49,17 @@ export async function asyncGetLoggedUser(): Promise<CHCUser | null> {
     })[0];
 }
 
-export async function asyncGetUser(id: string): Promise<CHCUser | null> {
+interface AsyncGetUserArgs { ignoreDeleted?: boolean }
+export async function asyncGetUser(id: string, options?: AsyncGetUserArgs): Promise<CHCUser | null> {
     const usuariosCollection = db.collection(db.store, "usuarios");
 
-    const usuarioQuery = db.query(usuariosCollection, db.where(db.documentId(), "==", id), db.where("deleted", "==", false));
+    const constraints = [db.where(db.documentId(), "==", id)];
+
+    if (options?.ignoreDeleted) {
+        constraints.push(db.where("deleted", "==", false));
+    }
+
+    const usuarioQuery = db.query(usuariosCollection, db.where(db.documentId(), "==", id), ...constraints);
     const usuario = await db.getDocs(usuarioQuery);
 
     return usuario.docs.map((doc) => {
@@ -99,6 +107,7 @@ export async function asyncGetEmployees() {
 
 export async function asyncLogin(login: string, senha: string, email?: string): Promise<CHCUser | AuthError> {
     try {
+        let deleted;
         if (login) {
             const usuariosCollection = db.collection(db.store, "usuarios");
             const usuarioQuery = db.query(usuariosCollection, db.where("login", "==", login));
@@ -110,12 +119,7 @@ export async function asyncLogin(login: string, senha: string, email?: string): 
 
             const usuario = usuarioDocs.docs[0].data() as CHCUser;
 
-            if (usuario.deleted) {
-                await db.signInWithEmailAndPassword(db.auth, usuario.email, senha);
-                await asyncDeleteUser(senha);
-
-                return AuthError.USER_NOT_FOUND;
-            }
+            deleted = usuario.deleted;
 
             email = usuario.email;
         }
@@ -125,6 +129,12 @@ export async function asyncLogin(login: string, senha: string, email?: string): 
         }
 
         await db.signInWithEmailAndPassword(db.auth, email, senha);
+
+        if (deleted && db.auth.currentUser?.emailVerified) {
+            await asyncDeleteUser(senha);
+
+            return AuthError.USER_NOT_FOUND;
+        }
 
         return await asyncGetLoggedUser() as CHCUser;
     } catch (error) {
@@ -153,11 +163,20 @@ export async function asyncRegister({login, nome, email, senha, senhaAtual, dtNa
         if (uidEmpresa) {
             currentPasswordCorrect = await passwordCorrect(senhaAtual!);
             if (!currentPasswordCorrect) {
-                return AuthError.WRONG_PASSWORD;
+                return AuthError.WRONG_COMPANY_PASSWORD;
             }
         }
         else {
             currentPasswordCorrect = null;
+        }
+
+        const [loginUnique, emailUnique] = await asyncCheckLoginAndEmailUnique(login, email);
+
+        if (!loginUnique) {
+            return AuthError.REPEATED_LOGIN;
+        }
+        if (!emailUnique) {
+            return AuthError.REPEATED_EMAIL;
         }
 
         const previousEmail = db.auth.currentUser?.email;
@@ -289,7 +308,7 @@ export async function asyncChangeUserEmailRaw(newEmail: string): Promise<boolean
         return true;
     } catch (error) {
         if (error instanceof FirebaseError) {
-            console.error("Error changin email raw", error.message);
+            console.error("Error changing email raw", error.message);
         }
     }
 
@@ -313,6 +332,18 @@ export async function asyncSendConfirmationEmail(): Promise<boolean> {
     }
 
     throw new Error("Could not send confirmation email");
+}
+
+export async function asyncCheckLoginAndEmailUnique(login: string, email: string): Promise<[boolean, boolean]> {
+    const usuariosCollection = db.collection(db.store, "usuarios");
+    const loginQuery = db.query(usuariosCollection, db.where("login", "==", login));
+    const emailQuery = db.query(usuariosCollection, db.where("email", "==", email));
+    const [loginSnapshot, emailSnapshot] = await Promise.all([
+        db.getDocs(loginQuery),
+        db.getDocs(emailQuery)
+    ]);
+
+    return [loginSnapshot.docs.length === 0, emailSnapshot.docs.length === 0];
 }
 
 function codeToError(errorCode: string): AuthError {
@@ -372,6 +403,12 @@ export function errorToString(error: AuthError): string {
             return "Senha inválida";
         case AuthError.WEAK_PASSWORD:
             return "Senha fraca";
+        case AuthError.REPEATED_EMAIL:
+            return "Este email já está cadastrado";
+        case AuthError.REPEATED_LOGIN:
+            return "Este login já está cadastrado";
+        case AuthError.WRONG_COMPANY_PASSWORD:
+            return "Senha da empresa incorreta";
         default:
             return "Erro desconhecido";
     }

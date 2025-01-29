@@ -13,7 +13,11 @@ import headerConfig from "@/helper/headerConfig";
 
 export default function Register() {
     const route = useRoute();
-    const { uidEmpresa } = route.params as { uidEmpresa: string | undefined};
+    const params = route.params as { uidEmpresa: string | undefined };
+    let uidEmpresa: string | undefined;
+
+    if (params)
+        uidEmpresa = params.uidEmpresa;
 
     const [tab, setTab] = useState<"cliente" | "empresa" | "funcionario">(uidEmpresa ? "funcionario" : "cliente");
     const [error, setError] = useState<string[]>([]);
@@ -99,8 +103,11 @@ export default function Register() {
         }
 
         if (tab === "cliente" || tab === "funcionario") {
-            if (cpfCnpj.length !== 11) {
+            if (cpfCnpj.length < 11) {
                 errors.push("CPF não possui caractéres o suficiente");
+            }
+            if (cpfCnpj.length > 11) {
+                errors.push("CPF possui caractéres a mais");
             }
             if (/\D/.test(cpfCnpj)) {
                 errors.push("CPF deve ser apenas dígitos");
