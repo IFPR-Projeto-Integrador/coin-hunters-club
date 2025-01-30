@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import { Reward, rewardErrorToUser } from "@/firebase/reward/types";
-import { uriToBase64 } from "@/helper/images";
+import { isImageTooLarge, uriToBase64 } from "@/helper/images";
 import * as Rewards from "@/firebase/reward/repository";
 import { useAuth } from "@/context/authContext";
 import { StdStyles } from "@/constants/Styles";
@@ -21,10 +21,6 @@ import headerConfig from "@/helper/headerConfig";
 export default function CreateReward() {
   const [user, loading] = useAuth();
 
-  if (loading) {
-    return null;
-  }
-
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [imageUri, setImageUri] = useState<string | null>(null);
@@ -34,7 +30,7 @@ export default function CreateReward() {
   const [error, setError] = useState<string[] | null>(null);
 
   const route = useRoute<{ key: string; name: string; params: { rewardId?: string } }>();
-  const { rewardId } = route.params;
+  
   const [loadingReward, setLoadingReward] = useState(true);
 
   useEffect(() => {
@@ -54,6 +50,15 @@ export default function CreateReward() {
       setLoadingReward(false);
     }
   }, [user]);
+
+  let rewardId: string | undefined;
+  if (route) {
+    rewardId = route.params.rewardId
+  }
+
+  if (loading) {
+    return null;
+  }
 
   const openGalleryWithCrop = async (): Promise<void> => {
     try {
@@ -96,6 +101,13 @@ export default function CreateReward() {
   async function save() {
     if (user == null) {
       return;
+    }
+
+    if (!imageUri) return;
+
+    if (isImageTooLarge(imageUri)) {
+      setError(["Imagem muito grande. Selecione uma imagem menor."]);
+      return
     }
 
     const reward: Reward = {
