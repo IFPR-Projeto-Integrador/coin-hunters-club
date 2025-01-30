@@ -3,6 +3,7 @@ import { getFirestore, collection, getDocs, addDoc, deleteDoc, setDoc, updateDoc
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, updateEmail, updatePassword, sendEmailVerification,
     reauthenticateWithCredential, EmailAuthProvider, deleteUser, sendPasswordResetEmail
  } from "firebase/auth";
+import { firebaseConfig } from "@/config";
 
 // Optionally import the services that you want to use
 // import {...} from "firebase/auth";
@@ -11,16 +12,6 @@ import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, creat
 // import {...} from "firebase/functions";
 // import {...} from "firebase/storage";
 
-// Initialize Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyBdij-6f3E6LnJOPBdaQiQbpwzLURPqAfs",
-    authDomain: "coin-hunters-club.firebaseapp.com",
-    projectId: "coin-hunters-club",
-    storageBucket: "coin-hunters-club.firebasestorage.app",
-    messagingSenderId: "987543843897",
-    appId: "1:987543843897:web:b3224469ac68ea479709e8",
-    measurementId: "G-JNJ1681P3E"
-};
 
 const app = initializeApp(firebaseConfig);
 const db = {
