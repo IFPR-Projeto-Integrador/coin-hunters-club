@@ -2,6 +2,7 @@ import db from "@/firebase/config"
 import { router } from "expo-router";
 import { FirebaseError } from "firebase/app";
 import { User } from "firebase/auth";
+import { Timestamp } from "firebase/firestore";
 
 export enum UserType {
     EMPRESA = "empresa",
@@ -14,12 +15,13 @@ export interface CHCUser {
     login: string;
     nome: string;
     email: string;
-    dtNascimento: string | null;
+    dtNascimento: Timestamp | null;
     cpfCnpj: string | null;
     tipoUsuario: UserType;
     uidEmpresa: string | null;
+    dtCadastro?: Timestamp;
     firestoreUser?: User;
-    deleted?: boolean
+    deleted?: boolean;
 }
 
 export interface RegisterInformation {
@@ -156,7 +158,7 @@ export async function asyncLogout() {
     }
 }
 
-export async function asyncRegister({login, nome, email, senha, senhaAtual, dtNascimento, cpfCnpj, tipoUsuario, uidEmpresa }: CHCUser & RegisterInformation):
+export async function asyncRegister({login, nome, email, senha, senhaAtual, dtNascimento, dtCadastro, cpfCnpj, tipoUsuario, uidEmpresa }: CHCUser & RegisterInformation):
     Promise<CHCUser | AuthError> {
     try {
         let currentPasswordCorrect: boolean | null;
@@ -193,6 +195,7 @@ export async function asyncRegister({login, nome, email, senha, senhaAtual, dtNa
             login: login,
             nome,
             dtNascimento,
+            dtCadastro,
             cpfCnpj,
             tipoUsuario,
             uidEmpresa,

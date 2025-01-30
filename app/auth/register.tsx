@@ -10,7 +10,8 @@ import { router } from 'expo-router';
 import { Paths } from "@/constants/Paths";
 import { useRoute } from "@react-navigation/native";
 import headerConfig from "@/helper/headerConfig";
-
+import db from "@/firebase/config";
+import { stringToDate } from "@/helper/dates";
 export default function Register() {
     const route = useRoute();
     const params = route.params as { uidEmpresa: string | undefined };
@@ -29,6 +30,7 @@ export default function Register() {
     const [confirmemail, setConfirmemail] = useState("");
     const [nome, setNome] = useState("");
     const [cpfCnpj, setCpfCnpj] = useState("");
+    const [dtNascimento, setDtNascimento] = useState("");
     const [senhaAtual, setSenhaAtual] = useState("");
 
     headerConfig({ title: "Cadastro de Funcionario", show: uidEmpresa ? true : false });
@@ -46,7 +48,8 @@ export default function Register() {
             login,
             nome,
             email,
-            dtNascimento: null,
+            dtNascimento: db.Timestamp.fromDate(stringToDate(dtNascimento as `${number}/${number}/${number}`)),
+            dtCadastro: db.Timestamp.now(),
             cpfCnpj,
             tipoUsuario: tab === "cliente" ? UserType.CLIENTE : tab === "funcionario" ? UserType.FUNCIONARIO : UserType.EMPRESA,
             senha,
@@ -102,6 +105,10 @@ export default function Register() {
             errors.push("Nome inválido");
         }
 
+        if (dtNascimento.length == 0) {
+            errors.push("Data de nascimento não pode estar vazia");
+        }
+
         if (tab === "cliente" || tab === "funcionario") {
             if (cpfCnpj.length < 11) {
                 errors.push("CPF não possui caractéres o suficiente");
@@ -143,6 +150,7 @@ export default function Register() {
                 <FormInput label="Email" placeholder="Digite seu email" setValue={setEmail} value={email} />
                 <FormInput label="Confirmar Email" placeholder="Confirme seu email" setValue={setConfirmemail} value={confirmemail} />
                 <FormInput label="Nome" placeholder={tab == "empresa" ? "Digite o nome da empresa" : "Digite o seu nome"} setValue={setNome} value={nome} />
+                <FormInput label="Data de nascimento" placeholder="DD/MM/YYYY" setValue={setDtNascimento} value={dtNascimento} date/>
                 <FormInput label={tab === "cliente" || tab === "funcionario" ? "CPF" : "CNPJ"} setValue={setCpfCnpj} value={cpfCnpj} placeholder={tab == "empresa" ? "Digite seu CNPJ" : "Digite seu CPF"}/>
                 { uidEmpresa && (
                     <FormInput label="Senha atual da empresa" setValue={setSenhaAtual} value={senhaAtual} placeholder="Senha atual" password/>
