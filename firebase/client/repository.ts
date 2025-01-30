@@ -2,12 +2,87 @@ import db from "@/firebase/config";
 import { asyncGetUserByLoggin as asyncGetUserByLogin, CHCUser, UserType } from "../user/user";
 import { asyncGetPromotionReward, asyncGetUserPromotions, asyncUpdatePromotionRewardStock } from "../promotion/repository";
 import { Promotion, promotionCollection, PromotionReward } from "../promotion/types";
-import { ClientWallet, CoinCredit, coinCreditCollection, CompaniesWithPromotions, promotionClientCollection, PromotionClientError, PromotionsWithRewards, redeemCollection, reservationCollection, RewardRedeem, RewardReservation, RewardReservationState } from "./types";
+import { ClientWallet, CoinCredit, coinCreditCollection, CompaniesWithPromotions, promotionClientCollection, PromotionClientError, PromotionsWithRewards, redeemCollection, reservationCollection, RewardRedeem, RewardReservation, RewardReservationState, UserRedeemedReward } from "./types";
 import { asyncGetManyRewardsById, asyncGetRewardById } from "../reward/repository";
-import { Reward } from "../reward/types";
+import { Reward, rewardCollection } from "../reward/types";
 import { genReservationCode } from "@/helper/codes";
 import { Timestamp } from "firebase/firestore";
 import { isOneHourInThePast } from "@/helper/dates";
+
+export async function asyncGetRedeemedRewards(uidUser: string): Promise<UserRedeemedReward[]> {
+    const usersCollectionRef = db.collection(db.store, "usuarios");
+    const companiesDocs = await db.getDocs(db.query(usersCollectionRef, db.where("tipoUsuario", "==", UserType.EMPRESA)));
+
+    const redeemedRewards: UserRedeemedReward[] = [];
+
+    for (const companyDoc of companiesDocs.docs) {
+        const company = companyDoc.data() as CHCUser;
+        const promotionsCollectionRef = db.collection(db.store, "usuarios", company.uid!, promotionCollection);
+        const promotionsDocs = await db.getDocs(promotionsCollectionRef);
+
+        for (const promotionDoc of promotionsDocs.docs) {
+            const redeemedReward: Partial<UserRedeemedReward> = {};
+
+            const promotion = promotionDoc.data() as Promotion;
+
+            redeemedReward.dtIniPromotion = promotion.dtStart;
+            redeemedReward.dtEndPromotion = promotion.dtEnd;
+            redeemedReward.namePromotion = promotion.name;
+
+            const userWallet = await asyncGetClientWallet(company.uid, promotion.uid!, uidUser);
+
+            if (!userWallet) {
+                continue;
+            }
+
+            const reservationDocs = await db.getDocs(
+                db.query(db.collection(db.store, "usuarios", company.uid!, promotionCollection, promotionDoc.id, reservationCollection),
+                db.where("state", "==", RewardReservationState.redeemed),
+                db.where("uidClientWallet", "==", userWallet.uid))
+            );
+
+            if (reservationDocs.empty) {
+                continue;
+            }
+
+            const reservationRewards = reservationDocs.docs.map(doc => doc.data() as RewardReservation);
+                
+            const rewardIds = reservationRewards.map(reservation => reservation.uidReward);
+
+            const rewardCollectionRef = db.collection(db.store, "usuarios", company.uid!, rewardCollection);
+            const rewardsDocs = await db.getDocs(db.query(rewardCollectionRef, db.where("uid", "in", rewardIds)));
+            const rewardsMap = new Map<string, Reward>();
+            rewardsDocs.docs.forEach(doc => {
+                const reward = doc.data() as Reward;
+                rewardsMap.set(reward.uid!, reward);
+            });
+
+            if (!redeemedReward.redeemedRewards) {
+                redeemedReward.redeemedRewards = [];
+            }
+
+            for (const reservation of reservationRewards) {
+                const reward = rewardsMap.get(reservation.uidReward);
+
+                if (!reward) continue;
+
+                redeemedReward.redeemedRewards.push({
+                    rewardName: reward.name,
+                    rewardImageBase64: reward.imageBase64,
+                    amount: reservation.amountReserved
+                })
+            }
+
+            const coinCreditCollectionRef = db.collection(db.store, "usuarios", company.uid!, promotionCollection, promotionDoc.id, coinCreditCollection);
+            const coinCreditDocs = await db.getDocs(db.query(coinCreditCollectionRef, db.where("uidClientWallet", "==", userWallet.uid)));
+            redeemedReward.totalCoinsGained = coinCreditDocs.docs.reduce((acc, doc) => acc + (doc.data() as CoinCredit).coinsReceived, 0);
+
+            redeemedRewards.push(redeemedReward as UserRedeemedReward);
+        }
+    }
+
+    return redeemedRewards
+}
 
 export async function asyncGetClientsTotalMoneyGains(
     uidCompany: string,

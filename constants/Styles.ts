@@ -16,6 +16,5 @@ export const StdStyles = StyleSheet.create({
         backgroundColor: Colors.panel,
         paddingVertical: 15,
         marginVertical: 15,
-        borderRadius: 15,
     }
 })

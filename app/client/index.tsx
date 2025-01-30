@@ -195,7 +195,6 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginHorizontal: 0,
         width: "80%",
-        borderRadius: 10,
     },
     promotionContainer: {
         backgroundColor: Colors.panel,

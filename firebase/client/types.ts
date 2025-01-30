@@ -13,6 +13,18 @@ export interface CompaniesWithPromotions {
     promotions: PromotionsWithRewards[];
 }
 
+export interface UserRedeemedReward {
+    dtIniPromotion: Timestamp;
+    dtEndPromotion: Timestamp;
+    namePromotion: string;
+    totalCoinsGained: number;
+    redeemedRewards: {
+        rewardName: string;
+        rewardImageBase64: string;
+        amount: number;
+    }[]
+}
+
 export interface ClientWallet {
     uid: string;
     uidClient: string;
