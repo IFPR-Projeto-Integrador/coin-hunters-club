@@ -101,6 +101,25 @@ export async function asyncGetPromotion(user: CHCUser, uid: string): Promise<Pro
     return doc.data() as Promotion;
 }
 
+export async function asyncGetPromotionName(uidCompany: string, uidPromotion: string): Promise<string | null> {
+    const promotionDocRef = db.doc(
+        db.store,
+        "usuarios",
+        uidCompany,
+        promotionCollection,
+        uidPromotion
+    );
+
+    const promotionDoc = await db.getDoc(promotionDocRef);
+
+    if (promotionDoc.exists()) {
+        const promotion = promotionDoc.data() as Promotion;
+        return promotion.name;
+    } else {
+        return null;
+    }
+}
+
 export async function asyncCreatePromotion(promotion: Promotion, client: CHCUser): Promise<Promotion | PromotionError[]> {
     if (!isValidPromotion(promotion)) {
         const errors = validatePromotion(promotion);

@@ -47,6 +47,7 @@ export default function RootLayout() {
         <Stack.Screen name="company/index" options={header({ title: "Empresa" })} />
 
         <Stack.Screen name="client/index" options={header({ title: "Promoções" })}/>
+        <Stack.Screen name="client/leaderboard" options={header({ title: "Leaderboard" })}/>
 
         <Stack.Screen name="employee/index" options={header({title: "Funcionário"})}/>
 

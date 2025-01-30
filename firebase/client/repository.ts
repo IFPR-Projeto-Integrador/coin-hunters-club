@@ -1,5 +1,5 @@
 import db from "@/firebase/config";
-import { asyncGetUserByLoggin as asyncGetUserByLogin, CHCUser } from "../user/user";
+import { asyncGetUserByLoggin as asyncGetUserByLogin, CHCUser, UserType } from "../user/user";
 import { asyncGetPromotionReward, asyncGetUserPromotions, asyncUpdatePromotionRewardStock } from "../promotion/repository";
 import { Promotion, promotionCollection, PromotionReward } from "../promotion/types";
 import { ClientWallet, CoinCredit, coinCreditCollection, CompaniesWithPromotions, promotionClientCollection, PromotionClientError, PromotionsWithRewards, redeemCollection, reservationCollection, RewardRedeem, RewardReservation, RewardReservationState } from "./types";
@@ -8,6 +8,81 @@ import { Reward } from "../reward/types";
 import { genReservationCode } from "@/helper/codes";
 import { Timestamp } from "firebase/firestore";
 import { isOneHourInThePast } from "@/helper/dates";
+
+export async function asyncGetClientsTotalMoneyGains(
+    uidCompany: string,
+    uidPromotion: string,
+): Promise<{ client: CHCUser, totalMoneyGains: number }[]> {
+    const clientsCollectionRef = db.collection(db.store, "usuarios");
+    const clientsQuery = db.query(clientsCollectionRef, 
+        db.where("tipoUsuario", "==", UserType.CLIENTE));
+    const clientsSnapshot = await db.getDocs(clientsQuery);
+
+    if (clientsSnapshot.empty) {
+        return [];
+    }
+
+    const clients = clientsSnapshot.docs.map(doc => doc.data() as CHCUser);
+    const clientsUids = clients.map(client => client.uid!);
+
+    const walletsCollectionRef = db.collection(
+        db.store,
+        "usuarios",
+        uidCompany,
+        promotionCollection,
+        uidPromotion,
+        promotionClientCollection
+    );
+    const walletsQuery = db.query(walletsCollectionRef, db.where("uidClient", "in", clientsUids));
+    const walletsSnapshot = await db.getDocs(walletsQuery);
+
+    if (walletsSnapshot.empty) {
+        return [];
+    }
+
+    const wallets = walletsSnapshot.docs.map(doc => doc.data() as ClientWallet);
+
+    const walletsByClientId = new Map<string, ClientWallet>();
+    wallets.forEach(wallet => {
+        walletsByClientId.set(wallet.uidClient, wallet);
+    });
+
+    const walletIds = wallets.map(wallet => wallet.uid);
+    const coinCreditCollectionRef = db.collection(
+        db.store,
+        "usuarios",
+        uidCompany,
+        promotionCollection,
+        uidPromotion,
+        coinCreditCollection
+    );
+    const coinCreditQuery = db.query(coinCreditCollectionRef, db.where("uidClientWallet", "in", walletIds));
+    const coinCreditSnapshot = await db.getDocs(coinCreditQuery);
+
+    const moneyGainsByWalletId = new Map<string, number>();
+    coinCreditSnapshot.forEach(doc => {
+        const coinCredit = doc.data() as CoinCredit;
+        const walletId = coinCredit.uidClientWallet;
+
+        if (!moneyGainsByWalletId.has(walletId)) {
+            moneyGainsByWalletId.set(walletId, 0);
+        }
+
+        moneyGainsByWalletId.set(walletId, moneyGainsByWalletId.get(walletId)! + coinCredit.coinsReceived);
+    });
+
+    const results = clients.map(client => {
+        const wallet = walletsByClientId.get(client.uid!);
+        const totalMoneyGains = wallet ? moneyGainsByWalletId.get(wallet.uid) || 0 : 0;
+
+        return {
+            client,
+            totalMoneyGains,
+        };
+    });
+
+    return results;
+}
 
 export async function asyncGetClientWallet(uidCompany: string, uidPromotion: string, uidUser: string): Promise<ClientWallet> {
     const collectionRef = db.collection(db.store, "usuarios", uidCompany, promotionCollection, uidPromotion, promotionClientCollection);

@@ -17,6 +17,8 @@ import { Text, StyleSheet, View, Image, TouchableOpacity, Modal } from "react-na
 import Icon from "@expo/vector-icons/FontAwesome";
 import { confirmPopup } from "@/helper/popups";
 import { useIsFocused } from "@react-navigation/native";
+import { router } from "expo-router";
+import { Paths } from "@/constants/Paths";
 
 
 
@@ -35,7 +37,6 @@ export default function IndexClient() {
         if (user) {
             asyncGetAllCompaniesForClient().then((promotions) => {
                 setPromotions(promotions);
-                console.log(promotions);
                 setLoadingReserve(false);
             }).catch(console.error);
         };
@@ -69,8 +70,8 @@ export default function IndexClient() {
         return selectedQuantity[promotionId + rewardId];
     }
 
-    async function openLeaderboard() {
-        console.log("Clicked leaderboard")
+    async function openLeaderboard(uidCompany: string, uidPromotion: string) {
+        router.navigate(`${Paths.LEADERBOARD}?uidCompany=${uidCompany}&uidPromotion=${uidPromotion}`);
     }
 
     async function reserveReward(uidCompany: string, uidPromotion: string, uidReward: string, amount: number, isAlreadyReserved: boolean) {
@@ -114,7 +115,7 @@ export default function IndexClient() {
                                 <View style={styles.ownedCoins}>
                                     <Text>{promotion.wallet.coins} Coins Conquistados</Text>
                                 </View>
-                                <TouchableOpacity style={styles.leaderboard} onPress={openLeaderboard}>
+                                <TouchableOpacity style={styles.leaderboard} onPress={() => openLeaderboard(company.company.uid, promotion.uid!)}>
                                     <Text>Leaderboard</Text>
                                 </TouchableOpacity>
                                 { promotion.rewards.map(reward => (

@@ -19,5 +19,7 @@ export enum Paths {
     FORGOT_PASSWORD = '/auth/forgotPassword',
     EMAIL_VERIFICATION = '/auth/emailVerification',
 
+    LEADERBOARD = '/client/leaderboard',
+
     SOON = "/soon"
 }
