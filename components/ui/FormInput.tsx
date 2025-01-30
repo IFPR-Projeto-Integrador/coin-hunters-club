@@ -1,6 +1,6 @@
 import { Colors } from '@/constants/Colors';
 import React, { useState } from 'react';
-import { TextInput, StyleSheet, View, Text, Keyboard } from 'react-native';
+import { TextInput, StyleSheet, View, Text, Keyboard, Platform } from 'react-native';
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import { dateToString, isDateStringDDMMYYYY, stringToDate } from '@/helper/dates';
 
@@ -17,6 +17,7 @@ interface Props {
 
 export function FormInput({ placeholder, label, value, setValue, inputBackgroundColor, password = false, date = false, number = false }: Props) {
   let changeTextFunc = undefined;
+  date = Platform.OS === "web" ? false : date;
 
   if (number) {
     changeTextFunc = (text: string) => {
