@@ -19,6 +19,7 @@ export interface UserRedeemedReward {
     namePromotion: string;
     totalCoinsGained: number;
     redeemedRewards: {
+        uidReward: string;
         rewardName: string;
         rewardImageBase64: string;
         amount: number;

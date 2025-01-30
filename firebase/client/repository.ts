@@ -66,7 +66,15 @@ export async function asyncGetRedeemedRewards(uidUser: string): Promise<UserRede
 
                 if (!reward) continue;
 
+                const alreadyInList = redeemedReward.redeemedRewards.find(redeemedReward => redeemedReward.uidReward === reward.uid!);
+
+                if (alreadyInList) {
+                    alreadyInList.amount += reservation.amountReserved;
+                    continue;
+                }
+
                 redeemedReward.redeemedRewards.push({
+                    uidReward: reward.uid!,
                     rewardName: reward.name,
                     rewardImageBase64: reward.imageBase64,
                     amount: reservation.amountReserved

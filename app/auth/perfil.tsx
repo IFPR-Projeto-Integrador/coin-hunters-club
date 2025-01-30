@@ -57,7 +57,7 @@ export default function Perfil() {
                     <Text style={styles.label}>{user?.tipoUsuario == UserType.EMPRESA ? "CNPJ" : "CPF"}:</Text>
                     <Text style={styles.info}>{user?.cpfCnpj}</Text>
                 </View>
-                { user?.tipoUsuario == UserType.CLIENTE && (
+                { user?.tipoUsuario == UserType.CLIENTE && trophies.length != 0 && (
                     <View style={[StdStyles.secondaryContainer, styles.trofeusContainer]}>
                         <Text style={styles.trofeusTitle}>Troféus</Text>
                         <View style={styles.trofeusList}>
