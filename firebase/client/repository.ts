@@ -156,7 +156,9 @@ export async function asyncGetRewardByReservationCode(uidCompany: string, code: 
 
     const reservation = reservations[0];
 
-    if (reservation.state !== RewardReservationState.reserved || isOneHourInThePast(reservation.dtReservation.toDate(), new Date(Date.now()))) {
+    const shouldExpire = isOneHourInThePast(reservation.dtReservation.toDate(), new Date(Date.now()));
+
+    if (reservation.state !== RewardReservationState.reserved || shouldExpire) {
         return null;
     }
 

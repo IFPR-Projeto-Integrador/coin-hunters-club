@@ -111,8 +111,8 @@ export default function EditPerfil() {
                     <FormInput label="Email" value={email} setValue={setEmail} inputBackgroundColor={email == user?.email ? undefined : Colors.primaryLighter}/>
                     <FormInput label="Senha" value={senha} setValue={setSenha} password inputBackgroundColor={senha.length == 0 ? undefined : Colors.primaryLighter }/>
                     <FormInput label="Senha atual" value={confirmarSenha} setValue={setConfirmarSenha} password/>
-                    <GoldButton title="Editar" onPress={onEdit} style={styles.button}/>
-                    <GoldButton title="Deletar Conta" onPress={deleteAccount} danger/>
+                    <GoldButton title="Editar" onPress={onEdit} style={styles.button} showLoading/>
+                    <GoldButton title="Deletar Conta" onPress={deleteAccount} danger showLoading/>
                 </View>
             </MainView>
         </Root>

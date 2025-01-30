@@ -77,7 +77,10 @@ export default function IndexEmployee() {
 
         setReservationCode(value);
 
-        if (value.length < 10) return;
+        if (value.length < 10) {
+            setReward(null);
+            return;
+        }
         
         const reservation = await asyncGetRewardByReservationCode(user?.uidEmpresa!, value);
 
@@ -106,14 +109,15 @@ export default function IndexEmployee() {
                     <Text>QR code detectado: {qrCodeValue}</Text>
                     <GoldButton title={permission.granted ? "Creditar" : "Conceder permissão a câmera"} 
                         onPress={permission.granted ? creditCoins : requestPermission} 
-                        style={[styles.button]}/>
+                        style={[styles.button]}
+                        showLoading/>
                     <FormInput setValue={setAndShowReward} value={reservationCode} label="Código da Reserva" placeholder="Código"/>
                     <View style={styles.imageContainer}>
                         <Text>{reward?.name}</Text>
                         <Image source={{ uri: reward?.imageBase64 }} style={styles.image}/>
                         <Text>{reward?.description}</Text>
                     </View>
-                    <GoldButton title="Resgatar" onPress={redeemReward} style={[styles.button]}/>
+                    <GoldButton title="Resgatar" onPress={redeemReward} style={[styles.button]} showLoading/>
                 </View>
             </MainView>
         </Root>

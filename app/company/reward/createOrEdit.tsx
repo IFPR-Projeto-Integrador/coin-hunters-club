@@ -145,6 +145,7 @@ export default function CreateReward() {
                 title="Salvar"
                 onPress={save}
                 style={styles.button}
+                showLoading
               />
 
               {error && error.map((e) => <Text key={e} style={styles.error}>{e}</Text>)}

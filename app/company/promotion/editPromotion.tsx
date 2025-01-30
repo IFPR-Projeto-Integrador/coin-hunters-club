@@ -65,7 +65,7 @@ export default function EditPromotion() {
                     <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
                         { errors.map(error => <Text key={error} style={styles.errorText}>{error}</Text>)}
                         <FormInput value={name} setValue={setName} label="Nome da promoção"/>
-                        <GoldButton style={styles.saveButton} title="Salvar" onPress={save}/>
+                        <GoldButton style={styles.saveButton} title="Salvar" onPress={save} showLoading/>
                     </View>
                 )}
             </MainView>

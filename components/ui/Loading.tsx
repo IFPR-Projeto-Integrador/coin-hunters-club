@@ -2,10 +2,13 @@ import { Colors } from '@/constants/Colors';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-export default function Loading() {
+interface LoadingProps {
+  transparent?: boolean;
+}
+export default function Loading({ transparent = false }: LoadingProps) {
   return (
-    <View style={styles.container}>
-      <ActivityIndicator size="large" color={Colors.primaryDarker} />
+    <View style={[styles.container, transparent ? { backgroundColor: "rgba(0, 0, 0, 0.5)"} : undefined]} >
+      <ActivityIndicator size="large" color={Colors.primaryDarker}/>
     </View>
   );
 };

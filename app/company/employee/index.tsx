@@ -54,7 +54,11 @@ export default function IndexCompanyEmployee() {
                                 <Text style={{ marginBottom: 5}}>Nome: {employee.nome}</Text>
                                 <Text>Email: {employee.email}</Text>
                             </View>
-                            <IconButton icon="trash" style={styles.deleteIcon} onPress={async () => await deleteEmployee(employee.uid)}/>
+                            <IconButton 
+                                icon="trash" 
+                                style={styles.deleteIcon} 
+                                onPress={async () => await deleteEmployee(employee.uid)}
+                                showLoading/>
                         </View>
                     ))}
             </MainView>

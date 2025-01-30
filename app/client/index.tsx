@@ -13,7 +13,7 @@ import { Reward } from "@/firebase/reward/types";
 import { dateToString } from "@/helper/dates";
 import headerConfig from "@/helper/headerConfig";
 import { useEffect, useState } from "react";
-import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native"
+import { Text, StyleSheet, View, Image, TouchableOpacity, Modal } from "react-native"
 import Icon from "@expo/vector-icons/FontAwesome";
 import { confirmPopup } from "@/helper/popups";
 import { useIsFocused } from "@react-navigation/native";
@@ -28,10 +28,16 @@ export default function IndexClient() {
     const [promotions, setPromotions] = useState<CompaniesWithPromotions[] | null>(null);
     const [selectedQuantity, setSelectedQuantity] = useState<Record<string, number>>({})
     const [reload, setReload] = useState(0);
+    const [loadingReserve, setLoadingReserve] = useState(false);
 
     useEffect(() => {
+        setLoadingReserve(true);
         if (user) {
-            asyncGetAllCompaniesForClient().then(setPromotions).catch(console.error);
+            asyncGetAllCompaniesForClient().then((promotions) => {
+                setPromotions(promotions);
+                console.log(promotions);
+                setLoadingReserve(false);
+            }).catch(console.error);
         };
     }, [user, reload, isFocused]);
 
@@ -68,17 +74,26 @@ export default function IndexClient() {
     }
 
     async function reserveReward(uidCompany: string, uidPromotion: string, uidReward: string, amount: number, isAlreadyReserved: boolean) {
-        if (isAlreadyReserved) {
-            confirmPopup("Erro", "Você já reservou essa recompensa.");
-            return;
+        setLoadingReserve(true);
+        try {
+            if (isAlreadyReserved) {
+                confirmPopup("Erro", "Você já reservou essa recompensa.");
+                return;
+            }
+            const result = await asyncReserveReward(uidCompany, uidPromotion, user?.uid!, uidReward, amount)
+    
+            if (typeof result == "number") {
+                confirmPopup("Erro", promotionClientErrorToUser(result));
+            }
+            else {
+                setReload(reload + 1);
+            }
         }
-        const result = await asyncReserveReward(uidCompany, uidPromotion, user?.uid!, uidReward, amount)
-
-        if (typeof result == "number") {
-            confirmPopup("Erro", promotionClientErrorToUser(result));
+        catch(e) {
+            confirmPopup("Erro", "Erro ao reservar recompensa.");
         }
-        else {
-            setReload(reload + 1);
+        finally {
+            setLoadingReserve(false);
         }
     }
 
@@ -162,6 +177,11 @@ export default function IndexClient() {
                     </Collapsible>   
                 )) }
             </MainView>
+            { loadingReserve && (
+                        <Modal style={styles.loadingModal} transparent animationType='fade'>
+                          <Loading transparent/>
+                        </Modal>
+                      ) }
             { !loading && <IconButton icon="refresh" size={28} onPress={onReload} style={styles.floatingButton} /> }
         </Root>
     )
@@ -301,5 +321,10 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.primaryDarker,
         borderRadius: 10,
     },
-    
+    loadingModal: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      },
 });

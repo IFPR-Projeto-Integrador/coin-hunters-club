@@ -160,6 +160,7 @@ export default function CreatePromotion() {
             title="Salvar"
             onPress={save}
             style={styles.button}
+            showLoading
           />
         
       </MainView>

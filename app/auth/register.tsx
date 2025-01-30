@@ -148,7 +148,7 @@ export default function Register() {
                     <FormInput label="Senha atual da empresa" setValue={setSenhaAtual} value={senhaAtual} placeholder="Senha atual" password/>
                 ) }
 
-                <GoldButton title="Cadastrar-se" onPress={cadastrar} style={styles.registerButton}></GoldButton>
+                <GoldButton title="Cadastrar-se" onPress={cadastrar} style={styles.registerButton} showLoading></GoldButton>
                 { !uidEmpresa && (
                     <GoldButton title="Retornar a tela de login" onPress={async () => {
                         await asyncLogout();

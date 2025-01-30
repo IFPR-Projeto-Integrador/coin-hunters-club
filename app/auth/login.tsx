@@ -58,6 +58,7 @@ export default function LoginScreen() {
           title="Logar"
           onPress={handleLogin}
           style={styles.loginButton}
+          showLoading
         />
         
         <Text style={styles.forgotPassword} onPress={goToForgotPassword}>

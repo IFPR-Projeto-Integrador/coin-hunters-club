@@ -38,7 +38,7 @@ export default function EmailVerification() {
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
                     <Text style={styles.verifyEmail}>Verificação de Email</Text>
                     <Text style={styles.descriptionText}>Clique no botão abaixo para enviar um email de confirmação. O email deve ser confirmado antes que possa prosseguir.</Text>
-                    <GoldButton title="Enviar Email" onPress={onSendEmail} style={[styles.sendEmailButton, styles.button]}/>
+                    <GoldButton title="Enviar Email" onPress={onSendEmail} style={[styles.sendEmailButton, styles.button]} showLoading/>
                     <GoldButton title="Voltar a tela de login" onPress={goToLogin} style={[styles.button]}/>
                 </View>
             </MainView>
