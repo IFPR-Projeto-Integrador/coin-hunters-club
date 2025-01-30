@@ -334,6 +334,19 @@ export async function asyncSendConfirmationEmail(): Promise<boolean> {
     throw new Error("Could not send confirmation email");
 }
 
+export async function asyncRequestPasswordReset(email: string): Promise<boolean> {
+    try {
+        await db.sendPasswordResetEmail(db.auth, email);
+        return true;
+    } catch (error) {
+        if (error instanceof FirebaseError) {
+            console.error("Error requesting password reset:", error.message);
+        }
+    }
+
+    throw new Error("Could not request password reset");
+}
+
 export async function asyncCheckLoginAndEmailUnique(login: string, email: string): Promise<[boolean, boolean]> {
     const usuariosCollection = db.collection(db.store, "usuarios");
     const loginQuery = db.query(usuariosCollection, db.where("login", "==", login));
