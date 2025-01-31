@@ -19,9 +19,8 @@ export default function IndexEmployee() {
     const [clientLogin, setClientLogin] = useState("");
     const [reservationCode, setReservationCode] = useState("");
     const [reward, setReward] = useState<Reward & { uidPromotion: string } | null>(null);
-    const [errors, setErrors] = useState<string[]>([]);
     const [permission, requestPermission] = useCameraPermissions();
-    const [qrCodeValue, setQrCodeValue] = useState<string | null>(null);
+    const [qrCodeValue, setQrCodeValue] = useState<number | null>(null);
 
     headerConfig({ title: user?.nome ?? "Funcionário", show: true });
 
@@ -36,22 +35,28 @@ export default function IndexEmployee() {
 
     async function creditCoins() {
         if (!qrCodeValue) {
-            alert("QR code não detectado")
+            await confirmPopup("Erro", "QR code não detectado");
             return
+        }
+
+        if (!clientLogin) {
+            await confirmPopup("Erro", "Por favor, digite o nome de algum usuário.");
+            return;
         }
 
         const result = await confirmPopup("Creditar moedas", `Deseja creditar moedas para o cliente ${clientLogin}?`);
 
         if (!result) return;
 
-        const value: { value: number } = JSON.parse(qrCodeValue);
-
-        const transactionResult = await asyncCreditCoins(user?.uidEmpresa!, value.value, clientLogin);
+        const transactionResult = await asyncCreditCoins(user?.uidEmpresa!, qrCodeValue, clientLogin);
 
         if (typeof transactionResult === "number") {
-            setErrors([promotionClientErrorToUser(transactionResult)]);
+            await confirmPopup("Erro", promotionClientErrorToUser(transactionResult));
+            return;
         }
 
+        setQrCodeValue(null);
+        setClientLogin("");
         alert("Coins creditados com sucesso!");
     }
 
@@ -92,21 +97,26 @@ export default function IndexEmployee() {
         setReward(reservation);
     }
 
+    function setQrCodeNumber(qrCode: string) {
+        const value: { value: number } = JSON.parse(qrCode);
+
+        setQrCodeValue(value?.value);
+    }   
+
     return (
         <Root requireAuth>
             <MainView>
-                { errors.map((error, index) => <Text key={index}>{error}</Text>) }
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
                     <FormInput setValue={setClientLogin} value={clientLogin} label="Login do Cliente" placeholder="Login"/>
                     <View style={styles.cameraContainer}>
                         <CameraView style={styles.camera} facing={"front"}
-                            onBarcodeScanned={(value) => setQrCodeValue(value.data)}
+                            onBarcodeScanned={(value) => setQrCodeNumber(value.data)}
                             barcodeScannerSettings={{
                                 barcodeTypes: ["qr"],
                             }}>
                         </CameraView>
                     </View>
-                    <Text>QR code detectado: {qrCodeValue}</Text>
+                    { qrCodeValue && <Text>Valor da compra: R${qrCodeValue.toFixed(2)}</Text> }
                     <GoldButton title={permission.granted ? "Creditar" : "Conceder permissão a câmera"} 
                         onPress={permission.granted ? creditCoins : requestPermission} 
                         style={[styles.button]}

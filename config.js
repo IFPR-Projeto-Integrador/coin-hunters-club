@@ -1,9 +1,9 @@
 export const firebaseConfig = {
-    apiKey: "AIzaSyD6F7t8BMaM59NFAJtdpw2YS48GqVPRVFQ",
-    authDomain: "projeto-teste-2308a.firebaseapp.com",
-    projectId: "projeto-teste-2308a",
-    storageBucket: "projeto-teste-2308a.firebasestorage.app",
-    messagingSenderId: "338887547362",
-    appId: "1:338887547362:web:6137a25f90392e649501bb",
-    measurementId: "G-NDBQ0SN4VW"
+    apiKey: "AIzaSyBdij-6f3E6LnJOPBdaQiQbpwzLURPqAfs",
+    authDomain: "coin-hunters-club.firebaseapp.com",
+    projectId: "coin-hunters-club",
+    storageBucket: "coin-hunters-club.firebasestorage.app",
+    messagingSenderId: "987543843897",
+    appId: "1:987543843897:web:b3224469ac68ea479709e8",
+    measurementId: "G-JNJ1681P3E"
 };
