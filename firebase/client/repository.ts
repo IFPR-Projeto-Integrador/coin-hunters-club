@@ -96,6 +96,8 @@ export async function asyncGetClientsTotalMoneyGains(
     uidCompany: string,
     uidPromotion: string,
 ): Promise<{ client: CHCUser, totalMoneyGains: number }[]> {
+    debugger;
+    console.log("Teste");
     const clientsCollectionRef = db.collection(db.store, "usuarios");
     const clientsQuery = db.query(clientsCollectionRef, 
         db.where("tipoUsuario", "==", UserType.CLIENTE));
@@ -119,11 +121,12 @@ export async function asyncGetClientsTotalMoneyGains(
     const walletsQuery = db.query(walletsCollectionRef, db.where("uidClient", "in", clientsUids));
     const walletsSnapshot = await db.getDocs(walletsQuery);
 
-    if (walletsSnapshot.empty) {
+    let wallets = walletsSnapshot.docs.map(doc => doc.data() as ClientWallet);
+    wallets = wallets.filter(wallet => wallet.coins != 0);
+
+    if (wallets.length == 0) {
         return [];
     }
-
-    const wallets = walletsSnapshot.docs.map(doc => doc.data() as ClientWallet);
 
     const walletsByClientId = new Map<string, ClientWallet>();
     wallets.forEach(wallet => {
@@ -154,7 +157,7 @@ export async function asyncGetClientsTotalMoneyGains(
         moneyGainsByWalletId.set(walletId, moneyGainsByWalletId.get(walletId)! + coinCredit.coinsReceived);
     });
 
-    const results = clients.map(client => {
+    let results = clients.map(client => {
         const wallet = walletsByClientId.get(client.uid!);
         const totalMoneyGains = wallet ? moneyGainsByWalletId.get(wallet.uid) || 0 : 0;
 
@@ -163,6 +166,8 @@ export async function asyncGetClientsTotalMoneyGains(
             totalMoneyGains,
         };
     });
+
+    results = results.filter(result => result.totalMoneyGains > 0);
 
     return results;
 }
