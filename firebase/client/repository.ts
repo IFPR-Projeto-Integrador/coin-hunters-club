@@ -96,8 +96,6 @@ export async function asyncGetClientsTotalMoneyGains(
     uidCompany: string,
     uidPromotion: string,
 ): Promise<{ client: CHCUser, totalMoneyGains: number }[]> {
-    debugger;
-    console.log("Teste");
     const clientsCollectionRef = db.collection(db.store, "usuarios");
     const clientsQuery = db.query(clientsCollectionRef, 
         db.where("tipoUsuario", "==", UserType.CLIENTE));

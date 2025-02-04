@@ -40,8 +40,6 @@ export default function Perfil() {
         return null;
     }
 
-    console.log(trophies);
-
     function onClickEditButton() {
         router.navigate(Paths.EDIT_PROFILE);
     }

@@ -109,7 +109,7 @@ export default function IndexEmployee() {
                 <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
                     <FormInput setValue={setClientLogin} value={clientLogin} label="Login do Cliente" placeholder="Login"/>
                     <View style={styles.cameraContainer}>
-                        <CameraView style={styles.camera} facing={"front"}
+                        <CameraView style={styles.camera} facing={"back"}
                             onBarcodeScanned={(value) => setQrCodeNumber(value.data)}
                             barcodeScannerSettings={{
                                 barcodeTypes: ["qr"],

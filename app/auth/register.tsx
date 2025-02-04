@@ -48,7 +48,7 @@ export default function Register() {
             login,
             nome,
             email,
-            dtNascimento: db.Timestamp.fromDate(stringToDate(dtNascimento as `${number}/${number}/${number}`)),
+            dtNascimento: tab != "empresa" ? db.Timestamp.fromDate(stringToDate(dtNascimento as `${number}/${number}/${number}`)) : null,
             dtCadastro: db.Timestamp.now(),
             cpfCnpj,
             tipoUsuario: tab === "cliente" ? UserType.CLIENTE : tab === "funcionario" ? UserType.FUNCIONARIO : UserType.EMPRESA,
@@ -105,8 +105,10 @@ export default function Register() {
             errors.push("Nome inválido");
         }
 
-        if (dtNascimento.length == 0) {
-            errors.push("Data de nascimento não pode estar vazia");
+        if (tab != "empresa") {
+            if (dtNascimento.length == 0) {
+                errors.push("Data de nascimento não pode estar vazia");
+            }
         }
 
         if (tab === "cliente" || tab === "funcionario") {
@@ -150,7 +152,9 @@ export default function Register() {
                 <FormInput label="Email" placeholder="Digite seu email" setValue={setEmail} value={email} />
                 <FormInput label="Confirmar Email" placeholder="Confirme seu email" setValue={setConfirmemail} value={confirmemail} />
                 <FormInput label="Nome" placeholder={tab == "empresa" ? "Digite o nome da empresa" : "Digite o seu nome"} setValue={setNome} value={nome} />
-                <FormInput label="Data de nascimento" placeholder="DD/MM/YYYY" setValue={setDtNascimento} value={dtNascimento} date/>
+                { tab != "empresa" && (
+                    <FormInput label="Data de nascimento" placeholder="DD/MM/YYYY" setValue={setDtNascimento} value={dtNascimento} date/>
+                ) }
                 <FormInput label={tab === "cliente" || tab === "funcionario" ? "CPF" : "CNPJ"} setValue={setCpfCnpj} value={cpfCnpj} placeholder={tab == "empresa" ? "Digite seu CNPJ" : "Digite seu CPF"}/>
                 { uidEmpresa && (
                     <FormInput label="Senha atual da empresa" setValue={setSenhaAtual} value={senhaAtual} placeholder="Senha atual" password/>
