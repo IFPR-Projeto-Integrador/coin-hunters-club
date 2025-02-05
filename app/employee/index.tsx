@@ -72,7 +72,7 @@ export default function IndexEmployee() {
             alert(promotionClientErrorToUser(result))
         }
 
-        alert("Reserva resgatada com sucesso")
+        alert("Recompensa resgatada com sucesso")
         setReward(null);
         setReservationCode("");
     }
