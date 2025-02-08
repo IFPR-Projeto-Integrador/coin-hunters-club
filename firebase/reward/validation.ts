@@ -17,9 +17,11 @@ export function isValidReward(reward: Reward): boolean {
 export function validRewardName(rewardName: string): RewardError[] {
     const errors: RewardError[] = [];
 
+    // RN 30 - Impede com que o nome da recompensa seja menor que 3 caracteres
     if (rewardName.length < 3) {
         errors.push(RewardError.NameTooShort);
     }
+    // RN 28 - Impede com que o nome da recompensa seja maior que 50 caracteres
     if (rewardName.length > 50) {
         errors.push(RewardError.NameTooLong);
     }
@@ -30,9 +32,11 @@ export function validRewardName(rewardName: string): RewardError[] {
 export function validRewardDescription(rewardDescription: string): RewardError[] {
     const errors: RewardError[] = [];
 
+    // RN 31 - Impede com que a descrição da recompensa seja menor que 3 caracteres
     if (rewardDescription.length < 3) {
         errors.push(RewardError.DescriptionTooShort);
     }
+    // RN 29 - Impede com que a descrição da recompensa seja maior que 500 caracteres
     if (rewardDescription.length > 500) {
         errors.push(RewardError.DescriptionTooLong);
     }

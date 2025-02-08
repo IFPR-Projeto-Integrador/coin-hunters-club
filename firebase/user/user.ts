@@ -172,6 +172,7 @@ export async function asyncRegister({login, nome, email, senha, senhaAtual, dtNa
             currentPasswordCorrect = null;
         }
 
+        // RN 01 - Verificar se o login e o email são únicos
         const [loginUnique, emailUnique] = await asyncCheckLoginAndEmailUnique(login, email);
 
         if (!loginUnique) {
@@ -269,10 +270,12 @@ export async function asyncEditUserEmailAndPassword(
         await asyncReAuth(user, currentPassword);
     
         if (user.email != newEmail && newEmail) {
+            // RN 19 - Firebase necessita que seja o usuário logado que altere o email
             await db.updateEmail(user, newEmail);
         }
     
         if (newPassword) {
+            // RN 19 - Firebase necessita que seja o usuário logado que altere a senha
             await db.updatePassword(user, newPassword);
         }
     

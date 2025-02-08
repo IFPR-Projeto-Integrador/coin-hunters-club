@@ -64,6 +64,8 @@ export default function EditPromotion() {
                 { promotion && (
                     <View style={[StdStyles.secondaryContainer, styles.mainContainer]}>
                         { errors.map(error => <Text key={error} style={styles.errorText}>{error}</Text>)}
+                        { /* RN 07 - Não é possível editar a conversão da promoção */ }
+                        { /* RN 27 - Não é possível editar nada além do nome da promoção*/}
                         <FormInput value={name} setValue={setName} label="Nome da promoção"/>
                         <GoldButton style={styles.saveButton} title="Salvar" onPress={save} showLoading/>
                     </View>

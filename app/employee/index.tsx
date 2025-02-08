@@ -34,6 +34,7 @@ export default function IndexEmployee() {
         return <Loading />
 
     async function creditCoins() {
+        // RN 20 - Não permite creditar coins se um QR code válido não tiver sido detectado
         if (!qrCodeValue) {
             await confirmPopup("Erro", "QR code não detectado");
             return

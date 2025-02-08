@@ -18,6 +18,7 @@ export async function asyncGetUserPromotions(user: CHCUser | string, options?: A
 
     let promotions = allRewards.docs.map(doc => doc.data() as Promotion);
 
+    // RN 13
     if (options?.onlyActiveOnes) {
         promotions = promotions.filter(promotion => promotionRunning(promotion));
     }
@@ -134,6 +135,8 @@ export async function asyncCreatePromotion(promotion: Promotion, client: CHCUser
     const overlappingPromotion = allPromotions.find(existingPromotion => 
         promotion.dtStart <= existingPromotion.dtEnd && promotion.dtEnd >= existingPromotion.dtStart);
 
+    // RN 06 - Apenas uma promoção pode estar ativa por vez (Não permite multiplas promoções no mesmo período, o que significa que apenas uma
+    // pode existir no mesmo período)
     if (overlappingPromotion) {
         return [PromotionError.PromotionOverlaps];
     }
@@ -152,6 +155,7 @@ export async function asyncCreatePromotion(promotion: Promotion, client: CHCUser
     };
 }
 
+// RN 07 - Não é possível editar a conversão da promoção
 export async function asyncEditPromotionName(promotion: Promotion, client: CHCUser, newName: string): Promise<Promotion | PromotionError> {
     const docRef = db.doc(db.store, "usuarios", client.uid, promotionCollection, promotion.uid ?? "");
 

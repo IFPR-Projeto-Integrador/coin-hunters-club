@@ -128,6 +128,7 @@ export default function CreatePromotion() {
           <FormInput label="Nome da promoção" setValue={setName} value={name} />
           <FormInput label="Data de início" setValue={setStartDate} value={startDate} date/>
           <FormInput label="Data de término" setValue={setEndDate} value={endDate} date />
+          { /* RN 07 Valor gasto em reais definidos na criação da promoção */}
           <FormInput label="Conversão" setValue={setConversion} value={conversion} number />
           <Text style={styles.text}>Valor em reais que será convertido em 1.000 Coins</Text>
 
@@ -179,6 +180,7 @@ export default function CreatePromotion() {
             )}
             <FormInput label="Preço unitário em coins" setValue={setUnitPriceInCoins} value={unitPriceInCoins} number/>
             <FormInput label="Estoque" setValue={setStock} value={stock} number />
+             { /* RN 08 - Apenas a empresa pode definir o limite por pessoa (E apenas a empresa, já que apenas ela tem acesso a essa tela) */ }
             <FormInput label="Limite por pessoa" setValue={setLimitPerPerson} value={limitPerPerson} number />
           </View>
           <GoldButton

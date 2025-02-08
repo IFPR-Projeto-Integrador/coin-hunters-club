@@ -17,6 +17,7 @@ import { Text, View, StyleSheet, Image } from "react-native";
 
 
 export default function Perfil() {
+    // RN 19 - Dados da conta podem ser editados apenas pelo próprio usuário, pois essa tela usa os dados do usuário logado no momento.
     const [user, loading] = useAuth();  
     const [trophies, setTrophies] = useState<UserRedeemedReward[]>([]);
 
@@ -55,6 +56,7 @@ export default function Perfil() {
                     <Text style={styles.label}>{user?.tipoUsuario == UserType.EMPRESA ? "CNPJ" : "CPF"}:</Text>
                     <Text style={styles.info}>{user?.cpfCnpj}</Text>
                 </View>
+                { /* RN 25 - Mostra os troféus apenas se o usuario for do tipo cliente */}
                 { user?.tipoUsuario == UserType.CLIENTE && trophies.length != 0 && (
                     <View style={[StdStyles.secondaryContainer, styles.trofeusContainer]}>
                         <Text style={styles.trofeusTitle}>Troféus</Text>

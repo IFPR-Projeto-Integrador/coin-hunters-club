@@ -50,7 +50,8 @@ export default function Register() {
             email,
             dtNascimento: tab != "empresa" ? db.Timestamp.fromDate(stringToDate(dtNascimento as `${number}/${number}/${number}`)) : null,
             dtCadastro: db.Timestamp.now(),
-            cpfCnpj,
+            cpfCnpj, 
+            // RN 02 - Conta associada a um único tipo de usuário
             tipoUsuario: tab === "cliente" ? UserType.CLIENTE : tab === "funcionario" ? UserType.FUNCIONARIO : UserType.EMPRESA,
             senha,
             senhaAtual: senhaAtual === "" ? undefined : senhaAtual,
@@ -81,10 +82,11 @@ export default function Register() {
             errors.push("Login não pode ser vazio");
         }
 
+        // RN 04 No mínimo 6 caracteres
         if (senha.length < 6) {
             errors.push("Senha deve ter no mínimo 6 caracteres");
         }
-
+        // RN 04 Verifica se tem uma letra maiúscula, uma minúscula, um número e um caractere especial.
         if (!passwordRegex.test(senha)) {
             errors.push("Senha deve conter ao menos um número, uma letra minúscula, uma letra maiúscula e um caractere especial");
         }
@@ -101,6 +103,7 @@ export default function Register() {
             errors.push("Emails não coincidem");
         }
 
+        // RN 03 - Nome deve ter no mínimo 3 caracteres
         if (nome.length < 3) {
             errors.push("Nome inválido");
         }

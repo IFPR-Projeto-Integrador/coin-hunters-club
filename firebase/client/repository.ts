@@ -222,6 +222,7 @@ export async function asyncGetReservationForReward(uidCompany: string, uidPromot
 
     const reservation = reservationDoc.docs[0].data() as RewardReservation;
 
+    // RN 17 - Expira a reserva se tiver passado da validade
     if (isOneHourInThePast(reservation.dtReservation.toDate(), new Date(Date.now())) && reservation.state === RewardReservationState.reserved) {
         const reward = await asyncGetPromotionReward(uidCompany, uidPromotion, uidReward);
 
@@ -229,6 +230,7 @@ export async function asyncGetReservationForReward(uidCompany: string, uidPromot
             throw new Error("Reward for uidReward in asyncGetReservationForReward was null.")
         }
 
+        // RN 22 - Retorna os coins para o cliente e o estoque para a recompensa após expirar a reserva
         await asyncExpireReservation(uidCompany, uidPromotion, reward, wallet);
         return null;
     }
@@ -250,6 +252,7 @@ export async function asyncExpireReservation(uidCompany: string, uidPromotion: s
     const reservation = reservationDoc.data() as RewardReservation;
 
     await db.setDoc(reservationDoc.ref, { state: RewardReservationState.expired, reservationCode: null }, { merge: true });
+    // RN 22 - Retorno dos coins e estoque
     await asyncUpdateWallet(uidCompany, uidPromotion, wallet.uidClient, wallet.coins + (reward.unitPrice * reservation.amountReserved));
     await asyncUpdatePromotionRewardStock(uidCompany, uidPromotion, reward.uidReward!, reward.stock + reservation.amountReserved);
 }
@@ -339,10 +342,12 @@ export async function asyncReserveReward(uidCompany: string, uidPromotion: strin
         return PromotionClientError.rewardNotFound;
     }
 
+    // RN 21 - Não permite a reserva se o cliente não possuir os coins necessários.
     if (wallet.coins < reward.unitPrice * amount) {
         return PromotionClientError.notEnoughCoins;
     }
 
+    // RN 21 - Não permite a reserva se a recompensa não possuir estoque suficiente.
     if (reward.stock < amount) {
         return PromotionClientError.notEnoughStock;
     }
@@ -355,12 +360,14 @@ export async function asyncReserveReward(uidCompany: string, uidPromotion: strin
         return PromotionClientError.cannotReserveMoreThan99;
     }
 
+    // RN 09 - Não permite com que o cliente reserve mais do que o limite estabelecido.
     if (amount > reward.limitPerUser) {
         return PromotionClientError.cannotReserveMoreThanLimitPerUser;
     }
 
     const totalBought = await asyncGetTotalBoughtRewards(uidCompany, uidPromotion, wallet.uid, uidReward);
 
+    // RN 09 - Não permite com que o cliente reserve mais do que o limite estabelecido.
     if (totalBought + amount > reward.limitPerUser) {
         return PromotionClientError.cannotReserveMoreThanLimitPerUser;
     }
@@ -386,6 +393,7 @@ export async function asyncReserveReward(uidCompany: string, uidPromotion: strin
     const docRef = await db.addDoc(collectionRef, reservation);
     await db.setDoc(docRef, { uid: docRef.id }, { merge: true });
 
+    // RN 22 - Reduz os coins do cliente e o estoque da recompensa
     await asyncUpdateWallet(uidCompany, uidPromotion, uidUser, wallet.coins - (reward.unitPrice * amount));
     await asyncUpdatePromotionRewardStock(uidCompany, uidPromotion, uidReward, reward.stock - amount);
 
@@ -407,10 +415,12 @@ export async function asyncRedeemReward(uidCompany: string, uidPromotion: string
         return PromotionClientError.alreadyRedeemed;
     }
 
+    // RN 17 - Nega se tiver passado da validade
     if (reservation.state === RewardReservationState.expired) {
         return PromotionClientError.alreadyExpired;
     }
 
+    // RN 17 - Nega se tiver passado da validade
     if (isOneHourInThePast(reservation.dtReservation.toDate(), new Date(Date.now()))) {
         return PromotionClientError.alreadyExpired;
     }
@@ -442,8 +452,9 @@ export async function asyncCreditCoins(uidCompany: string, value: number, userLo
         return PromotionClientError.clientNotFound
     }
 
+    // RN 13
     const activePromotions = await asyncGetUserPromotions(uidCompany, { onlyActiveOnes: true });
-
+    
     if (activePromotions.length === 0) {
         return PromotionClientError.noActivePromotion;
     }
@@ -454,6 +465,8 @@ export async function asyncCreditCoins(uidCompany: string, value: number, userLo
     const activePromotion = activePromotions[0];
     const uidPromotion = activePromotion.uid!;
 
+    // RN 11 - Uma carteira é criada apenas quando o usuário loga como um cliente para visualizar as promoções. Logo, apenas clientes
+    // podem receber coins.
     const wallet = await asyncGetClientWalletByLogin(uidCompany, uidPromotion, client);
 
     if (!wallet) {
@@ -466,6 +479,7 @@ export async function asyncCreditCoins(uidCompany: string, value: number, userLo
         uidEmployee: db.auth.currentUser!.uid,
         dtTransaction: Timestamp.fromDate(new Date(Date.now())),
         amountSpent: value,
+        // RN 14 - Valor determinado pela conversão (Valor do pagamento / Conversão (arredondado para baixo)) * 1000
         coinsReceived: (Math.floor(value/activePromotion.conversion)*1000)
     };
 
@@ -487,6 +501,7 @@ export async function asyncGetAllCompaniesForClient(): Promise<CompaniesWithProm
 
     for (const user of allUsers.docs) {
         const company = user.data() as CHCUser;
+        // RN 13
         const userPromotions = await asyncGetUserPromotions(company, { onlyActiveOnes: true });
         
         allCompaniesWithPromotions.push({
