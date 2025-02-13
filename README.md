@@ -11,6 +11,9 @@ Acesse <a href="https://nodejs.org/pt/download">este site</a> e siga as instruç
 
 Acesse <a href="https://console.firebase.google.com/u/0/?hl=pt-br">o site do firebase</a> e crie um novo projeto.
 
+As abas que serão citadas a baixo podem ser encontradas na "Visão Geral do Projeto", demonstrado na imagem a seguir:
+![alt text](image-3.png)
+
 Na aba de Autenticação (Authentication), habilite o método de login por email:
 ![alt text](image.png)
 
